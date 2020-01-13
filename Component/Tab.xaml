@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="MyCmd.Component.Tab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MyCmd.Component"
+             mc:Ignorable="d" 
+             d:DesignHeight="25" d:DesignWidth="250">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="#F1F1E6">
+        <StackPanel Orientation="Horizontal">
+            <RadioButton Name="cItem1" Content="1" Style="{StaticResource TabButtonC}" />
+            <RadioButton Name="cItem2" Content="2" Style="{StaticResource TabButtonC}" />
+            <RadioButton Name="cItem3" Content="3" Style="{StaticResource TabButtonC}" />
+            <RadioButton Name="cItem4" Content="4" Style="{StaticResource TabButtonC}" />
+            <RadioButton Name="cItem5" Content="5" Style="{StaticResource TabButtonC}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

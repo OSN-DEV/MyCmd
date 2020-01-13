@@ -1,0 +1,19 @@
+﻿<Window x:Class="MyCmd.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:u="clr-namespace:MyCmd.Component"
+        xmlns:local="clr-namespace:MyCmd"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" KeyDown="Window_KeyDown" MinHeight="100" MinWidth="100">
+    <Grid Name="cContainer">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <u:Tab x:Name="cTab" />
+        </StackPanel>
+    </Grid>
+</Window>
