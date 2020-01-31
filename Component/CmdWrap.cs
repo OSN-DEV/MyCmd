@@ -31,7 +31,7 @@ namespace MyCmd.Component {
         static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
         delegate Boolean ConsoleCtrlDelegate(uint CtrlType);
 
-        
+        private bool _isUtf8 = false;
         private Process _process;
         private Process _processUtf8;
         private Control _control;
@@ -70,10 +70,35 @@ namespace MyCmd.Component {
         /// </summary>
         /// <param name="command">command</param>
         public void SendCommand(string command) {
+            command = command.Trim();
+            if (command.StartsWith("git")) {
+                this._isUtf8 = true;
+            } else {
+                this._isUtf8 = false;
+            }
+            if (this._isUtf8) {
+                this._process.OutputDataReceived -= OutputDataReceived;
+                this._process.ErrorDataReceived -= ErrorDataReceived;
+                this._processUtf8.OutputDataReceived += OutputDataReceived;
+                this._processUtf8.ErrorDataReceived += ErrorDataReceived;
+            } else {
+                this._process.OutputDataReceived += OutputDataReceived;
+                this._process.ErrorDataReceived += ErrorDataReceived;
+                this._processUtf8.OutputDataReceived -= OutputDataReceived;
+                this._processUtf8.ErrorDataReceived -= ErrorDataReceived;
+            }
             if (!this.IsProcessValid()) {
                 return;
             }
-            this._process.StandardInput.WriteLine(command);
+            if (this._isUtf8) {
+                this._processUtf8.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+                this._processUtf8.StandardInput.WriteLine(command);
+            } else {
+                this._process.StandardInput.WriteLine(command);
+                if (command.StartsWith("cd")) {
+                    this._processUtf8.StandardInput.WriteLine(command);
+                }
+            }
         }
 
         /// <summary>
@@ -119,16 +144,6 @@ namespace MyCmd.Component {
         void OutputDataReceived(object sender, DataReceivedEventArgs e) {
             this._control.Dispatcher.Invoke(() => {
                 this.DoEvents();
-
-                //var a = Encoding.GetEncoding("Shift_JIS").GetString(Encoding.GetEncoding("Shift_JIS").GetBytes(e.Data));
-                //string b = Encoding.UTF8.GetString(Encoding.GetEncoding("Shift_JIS").GetBytes(a));
-
-                var a = Encoding.GetEncoding("Shift_JIS").GetString(Encoding.UTF8.GetBytes(e.Data));
-               string b = Encoding.UTF8.GetString(Encoding.GetEncoding("Shift_JIS").GetBytes(e.Data));
-                System.Diagnostics.Debug.Print(e.Data);
-                System.Diagnostics.Debug.Print(a);
-               System.Diagnostics.Debug.Print(b);
-                System.Diagnostics.Debug.Print("");
                 CmdOutputDataReceived?.Invoke(e.Data);
             });
         }
@@ -170,23 +185,27 @@ namespace MyCmd.Component {
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardInput = true;
-            //startInfo.StandardOutputEncoding = Encoding.UTF8;
-            //startInfo.StandardErrorEncoding = Encoding.UTF8;
             if (0 < this._currentDir.Length) {
                 startInfo.WorkingDirectory = this._currentDir;
             }
 
             this._process = new Process();
             this._process.StartInfo = startInfo;
-            this._process.OutputDataReceived += OutputDataReceived;
-            this._process.ErrorDataReceived += ErrorDataReceived;
             this._process.Exited += Exited;
             this._process.EnableRaisingEvents = true;
             this._process.Start();
             this._process.BeginOutputReadLine();
             this._process.BeginErrorReadLine();
 
-    
+            this._processUtf8 = new Process();
+            this._processUtf8.StartInfo = startInfo;
+            this._processUtf8.Exited += Exited;
+            this._processUtf8.EnableRaisingEvents = true;
+            this._processUtf8.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+            this._processUtf8.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+            this._processUtf8.Start();
+            this._processUtf8.BeginOutputReadLine();
+            this._processUtf8.BeginErrorReadLine();
         }
 
 

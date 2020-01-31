@@ -12,6 +12,6 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <RichTextBox Grid.Row="0" Name="cResult" FontFamily="Meiryo UI" FontSize="14" DockPanel.Dock="Top" IsReadOnly="True" />
-        <TextBox Padding="5" Grid.Row="1" Name="cCommand" DockPanel.Dock="Bottom" Block.LineHeight="1" FontSize="14" PreviewKeyDown="Command_KeyDown" />
+        <TextBox Padding="5" Grid.Row="1" Name="cCommand" DockPanel.Dock="Bottom" Block.LineHeight="1" FontSize="14" PreviewKeyDown="Command_KeyDown" Background="#EBEEF5" />
     </Grid>
 </UserControl>

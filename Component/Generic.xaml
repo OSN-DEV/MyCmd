@@ -55,7 +55,7 @@
 
     
     <!--Indivisual Style-->
-    <Style TargetType="RadioButton" x:Key="TabButtonC" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">
+    <Style TargetType="RadioButton" x:Key="TabButton" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Height" Value="25" />
         <Setter Property="Width" Value="50" />
@@ -70,7 +70,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="#BBBBBB" />
-                            <Setter Property="Background" Value="#F1F1E6" />
+                            <Setter Property="Background" Value="#EBEEF5" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter Property="Foreground" Value="#FFFFFF" />
@@ -109,7 +109,7 @@
     </Style>
     
     
-    <Style TargetType="Button" x:Key="TabButton" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+    <!--<Style TargetType="Button" x:Key="TabButton" BasedOn="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Height" Value="25" />
         <Setter Property="Width" Value="50" />
@@ -135,7 +135,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
+    </Style>-->
 
     <Style x:Key="LabelButton" TargetType="Button">
         <Setter Property="OverridesDefaultStyle" Value="True" />

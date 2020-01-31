@@ -63,8 +63,6 @@ namespace MyCmd.Component {
         }
         #endregion
 
-        private GitWrap git;
-
         #region Event
         private void Command_KeyDown(object sender, KeyEventArgs e) {
             AppCommon.DebugLog("key"  + e.Key.ToString());

@@ -13,13 +13,13 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid Background="#F1F1E6">
+    <Grid Background="#EBEEF5">
         <StackPanel Orientation="Horizontal">
-            <RadioButton Name="cItem1" Content="1" Style="{StaticResource TabButtonC}" />
-            <RadioButton Name="cItem2" Content="2" Style="{StaticResource TabButtonC}" />
-            <RadioButton Name="cItem3" Content="3" Style="{StaticResource TabButtonC}" />
-            <RadioButton Name="cItem4" Content="4" Style="{StaticResource TabButtonC}" />
-            <RadioButton Name="cItem5" Content="5" Style="{StaticResource TabButtonC}" />
+            <RadioButton Name="cItem1" Content="1" Style="{StaticResource TabButton}" />
+            <RadioButton Name="cItem2" Content="2" Style="{StaticResource TabButton}" />
+            <RadioButton Name="cItem3" Content="3" Style="{StaticResource TabButton}" />
+            <RadioButton Name="cItem4" Content="4" Style="{StaticResource TabButton}" />
+            <RadioButton Name="cItem5" Content="5" Style="{StaticResource TabButton}" />
         </StackPanel>
     </Grid>
 </UserControl>

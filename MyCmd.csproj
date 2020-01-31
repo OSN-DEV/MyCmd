@@ -60,10 +60,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Cmd\CmdProcess.cs" />
     <Compile Include="CommandList.xaml.cs">
       <DependentUpon>CommandList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Component\GitWrap.cs" />
     <Compile Include="Component\CmdWrap.cs" />
     <Compile Include="Component\Tab.xaml.cs">
       <DependentUpon>Tab.xaml</DependentUpon>
