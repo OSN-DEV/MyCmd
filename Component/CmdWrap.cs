@@ -28,18 +28,21 @@ namespace MyCmd.Component {
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         internal static extern bool FreeConsole();
         [DllImport("kernel32.dll")]
+
         static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
         delegate Boolean ConsoleCtrlDelegate(uint CtrlType);
 
+
+        private CmdProcess _currentCmd = null;
+        private CmdProcess _normalCmd;
+        private CmdProcess _utf8Cmd;
+
         private bool _isUtf8 = false;
-        private Process _process;
-        private Process _processUtf8;
         private Control _control;
         private string _currentDir = "";
 
-        public delegate void CmdEventHandler(string line);
-        public event CmdEventHandler CmdOutputDataReceived = null;
-        public event CmdEventHandler CmdErrorDataReceived = null;
+        public delegate void CmdEventHandler(bool isError, string line);
+        public event CmdEventHandler CmdEvent = null;
         #endregion
 
         #region Constructor
@@ -57,6 +60,27 @@ namespace MyCmd.Component {
         }
         #endregion
 
+        #region Event
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="isError"></param>
+        /// <param name="data"></param>
+        public void DataReceived(bool isError, string data) {
+            this._control.Dispatcher.Invoke(() => {
+                this.DoEvents();
+                CmdEvent?.Invoke(isError, data);
+            });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void CmdExit() {
+            // NOOP
+        }
+        #endregion
+
         #region Public Method
         /// <summary>
         /// start
@@ -70,35 +94,23 @@ namespace MyCmd.Component {
         /// </summary>
         /// <param name="command">command</param>
         public void SendCommand(string command) {
-            command = command.Trim();
             if (command.StartsWith("git")) {
                 this._isUtf8 = true;
+                this._normalCmd.SetReceivedListener(null);
+                this._normalCmd.SetExitedListener(null);
+                this._currentCmd = this._utf8Cmd;
+
             } else {
                 this._isUtf8 = false;
+                this._currentCmd = this._normalCmd;
+                this._utf8Cmd.SetReceivedListener(null);
+                this._utf8Cmd.SetExitedListener(null);
             }
-            if (this._isUtf8) {
-                this._process.OutputDataReceived -= OutputDataReceived;
-                this._process.ErrorDataReceived -= ErrorDataReceived;
-                this._processUtf8.OutputDataReceived += OutputDataReceived;
-                this._processUtf8.ErrorDataReceived += ErrorDataReceived;
-            } else {
-                this._process.OutputDataReceived += OutputDataReceived;
-                this._process.ErrorDataReceived += ErrorDataReceived;
-                this._processUtf8.OutputDataReceived -= OutputDataReceived;
-                this._processUtf8.ErrorDataReceived -= ErrorDataReceived;
-            }
-            if (!this.IsProcessValid()) {
-                return;
-            }
-            if (this._isUtf8) {
-                this._processUtf8.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-                this._processUtf8.StandardInput.WriteLine(command);
-            } else {
-                this._process.StandardInput.WriteLine(command);
-                if (command.StartsWith("cd")) {
-                    this._processUtf8.StandardInput.WriteLine(command);
-                }
-            }
+            this._currentCmd.SetReceivedListener(this.DataReceived);
+            this._utf8Cmd.SetExitedListener(this.CmdExit);
+            if (this._currentCmd.IsProcessValid()) {
+                this._currentCmd.WriteLine(command);
+            } 
         }
 
         /// <summary>
@@ -106,11 +118,11 @@ namespace MyCmd.Component {
         /// </summary>
         public void Break() {
             // if process is not valid, return;
-            if (!this.IsProcessValid()) {
+            if (!this._currentCmd.IsProcessValid()) {
                 return;
             }
 
-            if (AttachConsole((uint)this._process.Id)) {
+            if (AttachConsole((uint)this._currentCmd.ProcessId)) {
                 SetConsoleCtrlHandler(null, true);
                 try {
                     if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0)) {
@@ -128,86 +140,23 @@ namespace MyCmd.Component {
         /// dispose
         /// </summary>
         public void Dispose() {
-            if (this.IsProcessValid()) {
-                this._process.Kill();
-            }
-            this._process = null;
+            this._normalCmd.Kill();
+            this._utf8Cmd.Kill();
+            this._normalCmd = null;
+            this._utf8Cmd = null;
         }
         #endregion
 
-        #region Event
-        /// <summary>
-        /// std output data received
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void OutputDataReceived(object sender, DataReceivedEventArgs e) {
-            this._control.Dispatcher.Invoke(() => {
-                this.DoEvents();
-                CmdOutputDataReceived?.Invoke(e.Data);
-            });
-        }
-
-        /// <summary>
-        /// std error data received
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void ErrorDataReceived(object sender, DataReceivedEventArgs e) {
-            this._control.Dispatcher.Invoke(() => {
-                this.DoEvents();
-                CmdErrorDataReceived?.Invoke(e.Data);
-            });
-        }
-
-        /// <summary>
-        /// exit 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Exited(object sender, EventArgs e) {
-            //this.Dispose();
-            //if (this._needRestore) {
-            //    this.StartProcess();
-            //}
-        }
-        #endregion
 
         #region Private Method
         /// <summary>
         /// Create Process
         /// </summary>
         private void StartProcess() {
-            var startInfo = new ProcessStartInfo();
-            startInfo.CreateNoWindow = true;
-            startInfo.UseShellExecute = false;
-            startInfo.FileName = Environment.GetEnvironmentVariable("ComSpec");
-            startInfo.RedirectStandardOutput = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardInput = true;
-            if (0 < this._currentDir.Length) {
-                startInfo.WorkingDirectory = this._currentDir;
-            }
-
-            this._process = new Process();
-            this._process.StartInfo = startInfo;
-            this._process.Exited += Exited;
-            this._process.EnableRaisingEvents = true;
-            this._process.Start();
-            this._process.BeginOutputReadLine();
-            this._process.BeginErrorReadLine();
-
-            this._processUtf8 = new Process();
-            this._processUtf8.StartInfo = startInfo;
-            this._processUtf8.Exited += Exited;
-            this._processUtf8.EnableRaisingEvents = true;
-            this._processUtf8.StartInfo.StandardOutputEncoding = Encoding.UTF8;
-            this._processUtf8.StartInfo.StandardErrorEncoding = Encoding.UTF8;
-            this._processUtf8.Start();
-            this._processUtf8.BeginOutputReadLine();
-            this._processUtf8.BeginErrorReadLine();
+            this._normalCmd = new CmdProcess(this._currentDir, false);
+            this._utf8Cmd = new CmdProcess(this._currentDir, false);
+            this._currentCmd = this._normalCmd;
         }
-
 
         /// <summary>
         /// do events
@@ -221,21 +170,6 @@ namespace MyCmd.Component {
         private object ExitFrames(object obj) {
             ((DispatcherFrame)obj).Continue = false;
             return null;
-        }
-
-        /// <summary>
-        /// check if process is valid
-        /// </summary>
-        /// <returns>true: valid, false: otherwise</returns>
-        private bool IsProcessValid() {
-            if (null == this._process) {
-                return false;
-            }
-            bool result =  !this._process.HasExited;
-            if (!result) {
-                AppCommon.DebugLog("process is invalid");
-            }
-            return result;
         }
         #endregion
     }

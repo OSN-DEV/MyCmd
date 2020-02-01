@@ -60,7 +60,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Cmd\CmdProcess.cs" />
+    <Compile Include="Component\CmdProcess.cs" />
     <Compile Include="CommandList.xaml.cs">
       <DependentUpon>CommandList.xaml</DependentUpon>
     </Compile>

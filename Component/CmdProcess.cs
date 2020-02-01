@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using MyCmd.Util;
+using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace MyCmd.Cmd {
+namespace MyCmd.Component {
     /// <summary>
     /// Cmdプロセスのラッパー
     /// </summary>
@@ -15,11 +13,16 @@ namespace MyCmd.Cmd {
         public delegate void DataReceivedHandler(bool isError, string data);
         public DataReceivedHandler DataReceive = null;
 
-        public delegate void ProcessExitedHadler();
-        public ProcessExitedHadler ProcessExited = null;
+        public delegate void ProcessExitedHandler();
+        public ProcessExitedHandler ProcessExited = null;
 
         private Process _process = null;
         #endregion
+
+        #region Public Propert
+        public int ProcessId { get => this._process.Id; }
+        #endregion
+        
 
         #region Constructor
         /// <summary>
@@ -66,8 +69,50 @@ namespace MyCmd.Cmd {
         /// set data receive listener
         /// </summary>
         /// <param name="listener">listener</param>
-        public void SetOuputDataReceivedListener(DataReceivedHandler listener) {
+        public void SetReceivedListener(DataReceivedHandler listener) {
                 this.DataReceive = listener;
+        }
+
+        /// <summary>
+        /// set data receive listener
+        /// </summary>
+        /// <param name="listener">listener</param>
+        public void SetExitedListener(ProcessExitedHandler listener) {
+            this.ProcessExited = listener;
+        }
+        
+
+        /// <summary>
+        /// check if process is valid
+        /// </summary>
+        /// <returns>true: valid, false: otherwise</returns>
+        public bool IsProcessValid() {
+            if (null == this._process) {
+                return false;
+            }
+            bool result = !this._process.HasExited;
+            if (!result) {
+                AppCommon.DebugLog("process is invalid");
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// write command
+        /// </summary>
+        /// <param name="command"></param>
+        public void WriteLine(string command) {
+            this._process.StandardInput.WriteLine(command.Trim());
+        }
+
+        /// <summary>
+        /// kill process
+        /// </summary>
+        public void Kill() {
+            if (this.IsProcessValid()) {
+                this._process.Kill();
+            }
+            this._process = null;
         }
         #endregion
 
@@ -98,6 +143,11 @@ namespace MyCmd.Cmd {
             this._process.Start();
             this._process.BeginOutputReadLine();
             this._process.BeginErrorReadLine();
+
+
+            this.WriteLine(@"set PATH=%PATH%;D:\Program Files\Git\usr\bin;");
+            this.WriteLine(@"cd /d f://root");
+
 
             this._process.OutputDataReceived += OutputDataReceived;
             this._process.ErrorDataReceived += ErrorDataReceived;

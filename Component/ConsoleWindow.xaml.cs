@@ -133,15 +133,7 @@ namespace MyCmd.Component {
         /// std data received
         /// </summary>
         /// <param name="line"></param>
-        private void CmdOutputDataReceived(string line) {
-            this.AddLine(line);
-        }
-
-        /// <summary>
-        /// std error received
-        /// </summary>
-        /// <param name="line"></param>
-        private void CmdErrorDataReceived(string line) {
+        private void DataReceived(bool isUtf8, string line) {
             this.AddLine(line);
         }
         #endregion
@@ -163,8 +155,7 @@ namespace MyCmd.Component {
             this.Loaded += (sender, e) => {
                 this.cCommand.Focus();
             };
-            this._cmd.CmdOutputDataReceived += CmdOutputDataReceived;
-            this._cmd.CmdErrorDataReceived += CmdErrorDataReceived;
+            this._cmd.CmdEvent += DataReceived;
 
             // start process
             this._cmd.Start();
