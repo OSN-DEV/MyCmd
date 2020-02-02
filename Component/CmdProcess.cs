@@ -1,4 +1,5 @@
-﻿using MyCmd.Util;
+﻿using MyCmd.Data;
+using MyCmd.Util;
 using System;
 using System.Diagnostics;
 using System.Text;
@@ -23,7 +24,6 @@ namespace MyCmd.Component {
         public int ProcessId { get => this._process.Id; }
         #endregion
         
-
         #region Constructor
         /// <summary>
         /// constructor
@@ -127,6 +127,7 @@ namespace MyCmd.Component {
             startInfo.CreateNoWindow = true;
             startInfo.UseShellExecute = false;
             startInfo.FileName = Environment.GetEnvironmentVariable("ComSpec");
+            startInfo.FileName = "cmd.exe";
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardInput = true;
@@ -145,9 +146,13 @@ namespace MyCmd.Component {
             this._process.BeginErrorReadLine();
 
 
-            this.WriteLine(@"set PATH=%PATH%;D:\Program Files\Git\usr\bin;");
-            this.WriteLine(@"cd /d f://root");
-
+            var data = AppRepository.GetInstance();
+            foreach (var path in data.Path) {
+                this.WriteLine($"set PATH=%PATH%;{path};");
+            }
+            foreach (var cmd in data.StartUpCommand) {
+                this.WriteLine(cmd);
+            }
 
             this._process.OutputDataReceived += OutputDataReceived;
             this._process.ErrorDataReceived += ErrorDataReceived;

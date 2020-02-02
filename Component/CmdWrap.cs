@@ -109,7 +109,13 @@ namespace MyCmd.Component {
             this._currentCmd.SetReceivedListener(this.DataReceived);
             this._utf8Cmd.SetExitedListener(this.CmdExit);
             if (this._currentCmd.IsProcessValid()) {
-                this._currentCmd.WriteLine(command);
+
+                if (command.StartsWith("cd")) {
+                    this._normalCmd.WriteLine(command);
+                    this._utf8Cmd.WriteLine(command);
+                } else {
+                    this._currentCmd.WriteLine(command);
+                }
             } 
         }
 
@@ -146,7 +152,6 @@ namespace MyCmd.Component {
             this._utf8Cmd = null;
         }
         #endregion
-
 
         #region Private Method
         /// <summary>

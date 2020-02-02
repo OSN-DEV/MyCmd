@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MyCmd.Util;
 using MyLib.Data;
 
 namespace MyCmd.Data {
@@ -22,37 +23,29 @@ namespace MyCmd.Data {
         }
         public Location Pos { set; get; } = new Location();
         public Rect Size { set; get; } = new Rect();
-        private static string _settingFile;
+
+        public List<string> Path { set; get; } = new List<string>();
+        public List<string> StartUpCommand { set; get; } = new List<string>();
         #endregion
 
         #region Public Method
         /// <summary>
-        /// initialize
+        /// get instance
         /// </summary>
-        /// <param name="file"></param>
         /// <returns></returns>
-        public static AppRepository Init(string file) {
-            _settingFile = file;
-            GetInstanceBase(file);
-            if (!System.IO.File.Exists(file)) {
+        public static AppRepository GetInstance() {
+            GetInstanceBase(Constant.SettingFile);
+            if (!System.IO.File.Exists(Constant.SettingFile)) {
                 _instance.Save();
             }
             return _instance;
         }
 
         /// <summary>
-        /// get instance
-        /// </summary>
-        /// <returns></returns>
-        public static AppRepository GetInstance() {
-            return GetInstanceBase();
-        }
-
-        /// <summary>
         /// save settings
         /// </summary>
         public void Save() {
-            GetInstanceBase().SaveToXml(_settingFile);
+            GetInstanceBase().SaveToXml(Constant.SettingFile);
         }
         #endregion
     }

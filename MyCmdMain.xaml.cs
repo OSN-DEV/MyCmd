@@ -24,32 +24,34 @@ namespace MyCmd {
     /// <summary>
     /// MainWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class MainWindow : Window {
+    public partial class MyCmdMain : Window {
 
         #region Declaration
         private AppRepository _settings;
         private List<ConsoleWindow> _consoleList = new List<ConsoleWindow>();
         private ConsoleWindow _currentConsole = null;
+        private SystemMenu _systemMenu;
+
+        private const int SysMenuSettings = 1000;
         #endregion
 
         // https://dobon.net/vb/dotnet/process/standardoutput.html
         // https://qiita.com/superriver/items/47fd81b206a59a230c32
         // https://qiita.com/skitoy4321/items/10c47eea93e5c6145d48
         #region Constructor
-        public MainWindow() {
+        public MyCmdMain() {
             InitializeComponent();
-
             this.Initialize();
         }
         #endregion
 
         #region Event
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Window_KeyDown(object sender, KeyEventArgs e) {
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="sender"></param>
+            /// <param name="e"></param>
+            private void Window_KeyDown(object sender, KeyEventArgs e) {
 
             if (Key.T == e.Key && Common.IsModifierPressed(ModifierKeys.Control)) {
                 // Ctrl + T : add new Tab
@@ -74,6 +76,18 @@ namespace MyCmd {
                 return;
             }
         }
+
+
+        /// <summary>
+        /// SystemMenu
+        /// </summary>
+        /// <param name="e"></param>
+        private void SystemMenu_SystemMenuEvent(SystemMenu.SystemMenuEventArgs e) {
+            switch(e.MenuId) {
+                case SysMenuSettings:
+                    break;
+            }
+        }
         #endregion
 
         #region Private Method
@@ -81,8 +95,9 @@ namespace MyCmd {
         /// initialize
         /// </summary>
         private void Initialize() {
-            this._settings = AppRepository.Init(Constant.SettingFile);
-            
+            this._settings = AppRepository.GetInstance();
+
+
             // restore window position
             double pos = Common.GetWindowPosition(this._settings.Pos.X, this._settings.Size.W, SystemParameters.VirtualScreenWidth);
             if (0 <= pos) {
@@ -123,7 +138,20 @@ namespace MyCmd {
                     this._consoleList[i].Visibility = (i == index) ? Visibility.Visible : Visibility.Collapsed;
                 }
             };
+
+            // Add SystemMenu
+            //this.Loaded += (sender, e) => {
+            //    this._systemMenu = new SystemMenu(this);
+            //    this._systemMenu.SystemMenuEvent += SystemMenu_SystemMenuEvent;
+            //    this._systemMenu.AddMenu("設定", SysMenuSettings);
+            //    this._systemMenu.StartHook();
+            //};
+            //this.Closed += (sender, e) => {
+            //    this._systemMenu.Dispose();
+            //};
+
         }
+
 
         /// <summary>
         /// add tab

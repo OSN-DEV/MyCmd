@@ -65,6 +65,7 @@
       <DependentUpon>CommandList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Component\CmdWrap.cs" />
+    <Compile Include="Component\SystemMenu.cs" />
     <Compile Include="Component\Tab.xaml.cs">
       <DependentUpon>Tab.xaml</DependentUpon>
     </Compile>
@@ -87,7 +88,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
+    <Page Include="MyCmdMain.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -98,8 +99,8 @@
     <Compile Include="Component\ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="MyCmdMain.xaml.cs">
+      <DependentUpon>MyCmdMain.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
