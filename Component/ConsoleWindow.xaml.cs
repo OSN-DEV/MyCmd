@@ -86,24 +86,31 @@ namespace MyCmd.Component {
                             this._commandBuf.RemoveAt(0);
                         }
                     }
-                    //if (this.cCommand.Text.StartsWith("git")) {
-
-                    //     git = new GitWrap(this, @"E:\UserData\my-dic\books\「わかりやすい」文章を書く全技術100");
-                    //    git.CmdOutputDataReceived += (line) => {
-                    //        this.AddLine(line);
-                    //    };
-                    //    git.CmdErrorDataReceived += (line) => {
-                    //        this.AddLine(line);
-                    //    };
-                    //    git.Start();
-                    //    // git.SendCommand(this.cCommand.Text);
-
-                    //} else {
-                    //    this._cmd.SendCommand(this.cCommand.Text);
-                    //}
                     this._cmd.SendCommand(this.cCommand.Text);
                     this.cCommand.Text = "";
                     break;
+
+                case Key.Tab:
+                    if (this.cList.Visibility == Visibility.Visible) {
+                        this.cList.Items.Clear();
+                        this.cList.Items.Add("B");
+                        this.cList.Items.Add("B");
+                        this.cList.Items.Add("B");
+                        this.cList.Items.Add("B");
+                    } else {
+                        this.cList.Visibility = Visibility.Visible;
+                        this.cList.Focus();
+                        this.cList.Items.Add("A");
+                        this.cList.Items.Add("A");
+                        this.cList.Items.Add("A");
+                        this.cList.Items.Add("A");
+                        this.cList.Items.Add("A");
+                        this.cList.Items.Add("A");
+                        this.cList.Items.Add("A");
+                    }
+                    e.Handled = true;
+                    break;
+
                 case Key.Up:
                     if (Common.IsModifierPressed(ModifierKeys.Control)) {
                         e.Handled = true;

@@ -37,12 +37,18 @@ namespace MyCmd.Component {
         private CmdProcess _normalCmd;
         private CmdProcess _utf8Cmd;
 
-        private bool _isUtf8 = false;
         private Control _control;
         private string _currentDir = "";
 
         public delegate void CmdEventHandler(bool isError, string line);
         public event CmdEventHandler CmdEvent = null;
+
+
+        private enum CommandStatus {
+            Normal,
+            CheckPath
+        }
+        private CommandStatus _status = CommandStatus.Normal;
         #endregion
 
         #region Constructor
@@ -67,6 +73,14 @@ namespace MyCmd.Component {
         /// <param name="isError"></param>
         /// <param name="data"></param>
         public void DataReceived(bool isError, string data) {
+            if (CommandStatus.CheckPath == this._status) {
+                if (data.EndsWith(">cd")) {
+                    return;
+                }
+                this._currentDir = data;
+                this._status = CommandStatus.Normal;
+                return;
+            }
             this._control.Dispatcher.Invoke(() => {
                 this.DoEvents();
                 CmdEvent?.Invoke(isError, data);
@@ -94,22 +108,19 @@ namespace MyCmd.Component {
         /// </summary>
         /// <param name="command">command</param>
         public void SendCommand(string command) {
-            if (command.StartsWith("git")) {
-                this._isUtf8 = true;
+            if (this.IsNormalCommand(command)) {
+                this._currentCmd = this._normalCmd;
+                this._utf8Cmd.SetReceivedListener(null);
+                this._utf8Cmd.SetExitedListener(null);
+            } else {
                 this._normalCmd.SetReceivedListener(null);
                 this._normalCmd.SetExitedListener(null);
                 this._currentCmd = this._utf8Cmd;
 
-            } else {
-                this._isUtf8 = false;
-                this._currentCmd = this._normalCmd;
-                this._utf8Cmd.SetReceivedListener(null);
-                this._utf8Cmd.SetExitedListener(null);
             }
             this._currentCmd.SetReceivedListener(this.DataReceived);
             this._utf8Cmd.SetExitedListener(this.CmdExit);
             if (this._currentCmd.IsProcessValid()) {
-
                 if (command.StartsWith("cd")) {
                     this._normalCmd.WriteLine(command);
                     this._utf8Cmd.WriteLine(command);
@@ -159,8 +170,17 @@ namespace MyCmd.Component {
         /// </summary>
         private void StartProcess() {
             this._normalCmd = new CmdProcess(this._currentDir, false);
-            this._utf8Cmd = new CmdProcess(this._currentDir, false);
+            this._utf8Cmd = new CmdProcess(this._currentDir, true);
             this._currentCmd = this._normalCmd;
+
+            // Sleepをかけないとcdコマンドの実行結果以外の情報が表示される
+            // 50msが妥当化は微妙
+            this._control.Dispatcher.Invoke(() => {
+                Thread.Sleep(50);
+                this.DoEvents();
+                this._status = CommandStatus.CheckPath;
+                this.SendCommand("cd");
+            });
         }
 
         /// <summary>
@@ -175,6 +195,25 @@ namespace MyCmd.Component {
         private object ExitFrames(object obj) {
             ((DispatcherFrame)obj).Continue = false;
             return null;
+        }
+
+
+        private List<string> NormalCommand = new List<string> { "cd", "dir"};
+        /// <summary>
+        /// check commadn
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        private bool IsNormalCommand(string command) {
+            var result = true;
+            //var f = command.Split(' ');
+            //if (NormalCommand.Contains(f[0])) {
+            //    result = true;
+            //}
+            if (command.StartsWith("git")) {
+                result = false;
+            }
+            return result;
         }
         #endregion
     }

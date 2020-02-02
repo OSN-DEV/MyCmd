@@ -140,15 +140,15 @@ namespace MyCmd {
             };
 
             // Add SystemMenu
-            //this.Loaded += (sender, e) => {
-            //    this._systemMenu = new SystemMenu(this);
-            //    this._systemMenu.SystemMenuEvent += SystemMenu_SystemMenuEvent;
-            //    this._systemMenu.AddMenu("設定", SysMenuSettings);
-            //    this._systemMenu.StartHook();
-            //};
-            //this.Closed += (sender, e) => {
-            //    this._systemMenu.Dispose();
-            //};
+            this.Loaded += (sender, e) => {
+                this._systemMenu = new SystemMenu(this);
+                this._systemMenu.SystemMenuEvent += SystemMenu_SystemMenuEvent;
+                this._systemMenu.AddMenu("設定", SysMenuSettings);
+                this._systemMenu.StartHook();
+            };
+            this.Closed += (sender, e) => {
+                this._systemMenu.Dispose();
+            };
 
         }
 

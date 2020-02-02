@@ -53,7 +53,14 @@
         <Setter Property="Margin" Value="5,0" />
     </Style>
 
-    
+    <Style TargetType="ListBox">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource DefaultFonSize}" />
+        <Setter Property="Foreground" Value="{StaticResource DefaultTextForeground}" />
+        <Setter Property="Margin" Value="5,0" />
+    </Style>
+
     <!--Indivisual Style-->
     <Style TargetType="RadioButton" x:Key="TabButton" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
