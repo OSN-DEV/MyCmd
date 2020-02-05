@@ -32,9 +32,32 @@ namespace MyCmd.Component {
         public event ShowCommandLineHandler ShowCommandLine = null;
 
         private CmdWrap _cmd;
-        private List<string> _commandBuf = new List<string>();
-        private FlowDocument _flowDoc = new FlowDocument();
+        private readonly List<string> _commandBuf = new List<string>();
+        private readonly FlowDocument _flowDoc = new FlowDocument();
         private int _buffIndex = 0;
+
+        private class FileList {
+            private List<string> _files = new List<string>();
+            private const int FileCountPerPage = 10;
+            public int Page { set; get; } = 0;
+            public List<string> Files {
+                get {
+                    var result = new List<string>();
+                    int i = 0;
+                    int index = (this.Page - 1) * FileCountPerPage;
+                    while(i < FileCountPerPage && index < _files.Count) {
+                        result.Add(_files[index]);
+                        index++;
+                    }
+                    return result;
+                }
+            }
+
+            public void AddFiles(string file) {
+                this._files.Add(file);
+            }
+
+        }
         #endregion
 
         #region Constructor
