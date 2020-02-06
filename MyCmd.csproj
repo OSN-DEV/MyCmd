@@ -133,6 +133,8 @@
   <ItemGroup>
     <Content Include="libs\MyLib.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Command\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
