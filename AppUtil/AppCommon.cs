@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace MyCmd.Util {
+namespace MyCmd.AppUtil {
     internal class AppCommon {
         #region Public Method
         ///// <summary>

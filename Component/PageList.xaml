@@ -1,0 +1,76 @@
+﻿<UserControl x:Class="MyCmd.Component.PageList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:u="clr-namespace:MyCmd.Component"
+             mc:Ignorable="d" 
+             d:DesignWidth="300" Height="Auto">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <u:WidthConverter x:Key="widthConverter"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <DockPanel>
+        <TextBlock Name="cPage" Text="1/2" DockPanel.Dock="Top" TextAlignment="Right" Padding="5"/>
+        <ListView Name="cListData" ItemsSource="{Binding}"  Margin="0"  
+                  SelectionMode="Single" SizeChanged="ListData_SizeChanged" PreviewKeyDown="ListData_PreviewKeyDown" MouseDoubleClick="ListData_MouseDoubleClick">
+            
+            <ListView.ItemContainerStyle >
+                <Style TargetType="ListViewItem" >
+                    <Setter Property="OverridesDefaultStyle" Value="True"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ContentControl}">
+                                <Border BorderBrush="Transparent" BorderThickness="1" Background="{TemplateBinding Background}">
+                                    <GridViewRowPresenter />
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True" >
+                            <Setter Property="Background" Value="#FFE6E0E0" />
+                            <Setter Property="BorderBrush" Value="#FFE6E0E0" />
+                            <Setter Property="Foreground" Value="{StaticResource DefaultTextForeground}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True" >
+                            <Setter Property="Cursor" Value="Hand" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.Resources>
+                <Style TargetType="GridViewColumnHeader">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Style>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="30">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid VerticalAlignment="Bottom" >
+                                    <u:CustomImage Source="{Binding IconSource}" Height="24" HorizontalAlignment="Stretch" Stretch="Uniform" VerticalAlignment="Stretch" />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <TextBlock Text="{Binding DisplayName}" Foreground="{Binding TextColor}" VerticalAlignment="Stretch" Padding="5 2 0 2" FontSize="{StaticResource DefaultFonSize}"  />
+                                </Grid>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </DockPanel>
+</UserControl>

@@ -41,6 +41,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -61,20 +62,20 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Cmd\CmdProcess.cs" />
-    <Compile Include="CommandList.xaml.cs">
-      <DependentUpon>CommandList.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Component\CmdWrap.cs" />
+    <Compile Include="Component\CustomImage.cs" />
+    <Compile Include="Component\PageList.xaml.cs">
+      <DependentUpon>PageList.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Component\Tab.xaml.cs">
       <DependentUpon>Tab.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Component\WidthConverter.cs" />
     <Compile Include="Data\AppRepository.cs" />
-    <Compile Include="Util\AppCommon.cs" />
-    <Compile Include="Util\Constant.cs" />
-    <Page Include="CommandList.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <Compile Include="Data\PageListViewModel.cs" />
+    <Compile Include="AppUtil\AppCommon.cs" />
+    <Compile Include="AppUtil\Constant.cs" />
+    <Compile Include="AppUtil\NativeMethods.cs" />
     <Page Include="Component\ConsoleWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -82,6 +83,10 @@
     <Page Include="Component\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Component\PageList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Component\Tab.xaml">
       <SubType>Designer</SubType>
@@ -131,6 +136,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="libs\MyLib.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\OsnCsLib\Common\OsnCsLib.Common.csproj">
+      <Project>{cef63fd7-a8b3-4b76-a801-5bdc95a4045e}</Project>
+      <Name>OsnCsLib.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\OsnCsLib\WPFComponent\OsnCsLib.WPFComponent.csproj">
+      <Project>{5483100c-ae23-4081-bf76-ed148e30fe1c}</Project>
+      <Name>OsnCsLib.WPFComponent</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

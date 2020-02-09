@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MyLib.Util;
 using System.Windows.Media;
-using MyLib.Util;
-namespace MyCmd.Util {
+namespace MyCmd.AppUtil {
     /// <summary>
     /// constant definition
     /// </summary>
@@ -48,9 +43,23 @@ namespace MyCmd.Util {
         internal static readonly Brush ConsoleBackground = GetBrushFromHex("#EBEEF5");
 
         /// <summary>
-        /// TabBackground
+        /// Tab Background
         /// </summary>
         internal static readonly Brush TabBackground = GetBrushFromHex("#F1F1E6");
+
+
+        /// <summary>
+        /// PageList text color
+        /// </summary>
+        internal static readonly Brush PageListForeground = GetBrushFromHex("#333333");
+
+
+        /// <summary>
+        /// PageList Background color
+        /// </summary>
+        internal static readonly Brush PageListBackground = GetBrushFromHex("#d3d3c8");
+
+
 
         /// <summary>
         /// get color brush from Hex string 
