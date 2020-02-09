@@ -1,5 +1,5 @@
 ﻿using MyCmd.Data;
-using MyCmd.Util;
+using MyCmd.AppUtil;
 using System;
 using System.Diagnostics;
 using System.Text;

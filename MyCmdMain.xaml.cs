@@ -1,6 +1,6 @@
 ﻿using MyCmd.Component;
 using MyCmd.Data;
-using MyCmd.Util;
+using MyCmd.AppUtil;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -64,19 +64,6 @@ namespace MyCmd {
                 return;
             }
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="commandLine"></param>
-        private void Console_ShowCommandLine(List<string> commandLine) {
-            var dialog = new CommandList(commandLine);
-            dialog.Owner = this;
-            if (true != dialog.ShowDialog()) {
-                return;
-            }
-        }
-
 
         /// <summary>
         /// SystemMenu
@@ -177,7 +164,6 @@ namespace MyCmd {
         /// </summary>
         private void AddConsole() {
             this._currentConsole = new ConsoleWindow();
-            this._currentConsole.ShowCommandLine += Console_ShowCommandLine;
             Grid.SetRow(this._currentConsole, 1);
             Grid.SetColumn(this._currentConsole, 0);
             this.cContainer.Children.Add(this._currentConsole);
