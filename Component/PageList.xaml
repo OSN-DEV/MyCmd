@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:u="clr-namespace:MyCmd.Component"
+             xmlns:wc="clr-namespace:OsnCsLib.WPFComponent;assembly=OsnCsLib.WPFComponent"
              mc:Ignorable="d" 
              d:DesignWidth="300" Height="Auto">
     <UserControl.Resources>
@@ -15,8 +16,9 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <DockPanel>
-        <TextBlock Name="cPage" Text="1/2" DockPanel.Dock="Top" TextAlignment="Right" Padding="5"/>
-        <ListView Name="cListData" ItemsSource="{Binding}"  Margin="0"  
+        <TextBlock Name="cPage" Text="1/2" DockPanel.Dock="Top" TextAlignment="Right" Padding="5" Margin="0 0 10 0"/>
+        <TextBlock Height="1" Background="Silver" Text=" " DockPanel.Dock="Top" />
+        <ListView BorderThickness="0" Background="Transparent" Name="cListData" ItemsSource="{Binding}"  Margin="0"  
                   SelectionMode="Single" SizeChanged="ListData_SizeChanged" PreviewKeyDown="ListData_PreviewKeyDown" MouseDoubleClick="ListData_MouseDoubleClick">
             
             <ListView.ItemContainerStyle >
@@ -55,7 +57,7 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <Grid VerticalAlignment="Bottom" >
-                                    <u:CustomImage Source="{Binding IconSource}" Height="24" HorizontalAlignment="Stretch" Stretch="Uniform" VerticalAlignment="Stretch" />
+                                    <wc:CustomImage Source="{Binding Icon}" Height="24" HorizontalAlignment="Stretch" Stretch="Uniform" VerticalAlignment="Stretch" />
                                 </Grid>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>

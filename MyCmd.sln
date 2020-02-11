@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsnCsLib.Common", "..\..\Os
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsnCsLib.WPFComponent", "..\..\OsnCsLib\WPFComponent\OsnCsLib.WPFComponent.csproj", "{5483100C-AE23-4081-BF76-ED148E30FE1C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsnCsLib.File", "..\..\OsnCsLib\File\OsnCsLib.File.csproj", "{514A455B-ADE8-44D3-A345-C0DA4988A5DF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{5483100C-AE23-4081-BF76-ED148E30FE1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5483100C-AE23-4081-BF76-ED148E30FE1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5483100C-AE23-4081-BF76-ED148E30FE1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{514A455B-ADE8-44D3-A345-C0DA4988A5DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{514A455B-ADE8-44D3-A345-C0DA4988A5DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{514A455B-ADE8-44D3-A345-C0DA4988A5DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{514A455B-ADE8-44D3-A345-C0DA4988A5DF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

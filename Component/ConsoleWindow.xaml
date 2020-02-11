@@ -12,8 +12,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <RichTextBox Grid.Row="0" Name="cResult" FontFamily="Meiryo UI" FontSize="14" DockPanel.Dock="Top" IsReadOnly="True" />
-        <ListBox x:Name="cList" ItemsSource="{Binding}" SelectionMode="Single" Grid.Row="0" Height="300" VerticalAlignment="Bottom" Background="AliceBlue" Visibility="Collapsed" >
-        </ListBox>
+        <local:PageList x:Name="cPageList" Grid.Row="0" VerticalAlignment="Bottom" Margin="1 0" />
 
         <TextBox Padding="5" Grid.Row="1" Name="cCommand" DockPanel.Dock="Bottom" Block.LineHeight="1" FontSize="14" PreviewKeyDown="Command_KeyDown" Background="#EBEEF5" />
     </Grid>

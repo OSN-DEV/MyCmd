@@ -64,13 +64,13 @@
     <Compile Include="AppUtil\AppCommon.cs" />
     <Compile Include="AppUtil\Constant.cs" />
     <Compile Include="AppUtil\NativeMethods.cs" />
+    <Compile Include="Command\CdCommand.cs" />
+    <Compile Include="Command\CommandBase.cs" />
     <Compile Include="Component\CmdProcess.cs" />
     <Compile Include="Component\CmdWrap.cs" />
-    <Compile Include="Component\CustomImage.cs" />
     <Compile Include="Component\PageList.xaml.cs">
       <DependentUpon>PageList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Component\SystemMenu.cs" />
     <Compile Include="Component\Tab.xaml.cs">
       <DependentUpon>Tab.xaml</DependentUpon>
     </Compile>
@@ -138,13 +138,15 @@
   <ItemGroup>
     <Content Include="libs\MyLib.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Command\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\OsnCsLib\Common\OsnCsLib.Common.csproj">
       <Project>{cef63fd7-a8b3-4b76-a801-5bdc95a4045e}</Project>
       <Name>OsnCsLib.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\OsnCsLib\File\OsnCsLib.File.csproj">
+      <Project>{514a455b-ade8-44d3-a345-c0da4988a5df}</Project>
+      <Name>OsnCsLib.File</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\OsnCsLib\WPFComponent\OsnCsLib.WPFComponent.csproj">
       <Project>{5483100c-ae23-4081-bf76-ed148e30fe1c}</Project>

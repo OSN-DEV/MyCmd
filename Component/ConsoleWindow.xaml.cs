@@ -1,22 +1,13 @@
 ﻿using MyCmd.AppUtil;
+using MyLib.Util;
+using OsnCsLib.Common;
+using OsnCsLib.File;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using MyLib.Util;
-using MyCmd.Component;
 
 namespace MyCmd.Component {
     // https://qiita.com/skitoy4321/items/10c47eea93e5c6145d48
@@ -28,36 +19,10 @@ namespace MyCmd.Component {
     public partial class ConsoleWindow : UserControl {
 
         #region Declaration
-        public delegate void ShowCommandLineHandler(List<string> commandLine);
-        public event ShowCommandLineHandler ShowCommandLine = null;
-
-        private CmdWrap _cmd;
         private readonly List<string> _commandBuf = new List<string>();
-        private readonly FlowDocument _flowDoc = new FlowDocument();
         private int _buffIndex = 0;
 
-        private class FileList {
-            private List<string> _files = new List<string>();
-            private const int FileCountPerPage = 10;
-            public int Page { set; get; } = 0;
-            public List<string> Files {
-                get {
-                    var result = new List<string>();
-                    int i = 0;
-                    int index = (this.Page - 1) * FileCountPerPage;
-                    while(i < FileCountPerPage && index < _files.Count) {
-                        result.Add(_files[index]);
-                        index++;
-                    }
-                    return result;
-                }
-            }
-
-            public void AddFiles(string file) {
-                this._files.Add(file);
-            }
-
-        }
+        private readonly FlowDocument _flowDoc = new FlowDocument();
         #endregion
 
         #region Constructor
@@ -67,33 +32,23 @@ namespace MyCmd.Component {
         public ConsoleWindow() {
             InitializeComponent();
             this.Initialize();
+            this.AddLine(this.CurrentPath);
         }
         #endregion
 
-        #region Public Method
-        public List<string>CommandBuf {
-            get { return this._commandBuf; }
-        }
-        #endregion
-
-        #region Public Method
+        #region Public Property
         /// <summary>
-        /// close process
+        /// current absolute path
         /// </summary>
-        /// <param name="isClosing">true:app is closing, false:otherwise</param>
-        public void CloseProc(bool isClosing = false) {
-            this._cmd.Dispose();
-        }
+        public string CurrentPath { set; get; } = Environment.CurrentDirectory;
+        #endregion
+
+        #region Public Method
         #endregion
 
         #region Event
         private void Command_KeyDown(object sender, KeyEventArgs e) {
             AppCommon.DebugLog("key"  + e.Key.ToString());
-            if (Common.IsModifierPressed(ModifierKeys.Control) && e.Key == Key.B) {
-                    e.Handled = true;
-                    this._cmd.Break();
-                return;
-            }
             switch (e.Key) {
                 case Key.Enter:
                     if (0 == this.cCommand.Text.Length) {
@@ -109,37 +64,21 @@ namespace MyCmd.Component {
                             this._commandBuf.RemoveAt(0);
                         }
                     }
-                    this._cmd.SendCommand(this.cCommand.Text);
+                    //this._cmd.SendCommand(this.cCommand.Text);
                     this.cCommand.Text = "";
                     break;
 
                 case Key.Tab:
-                    if (this.cList.Visibility == Visibility.Visible) {
-                        this.cList.Items.Clear();
-                        this.cList.Items.Add("B");
-                        this.cList.Items.Add("B");
-                        this.cList.Items.Add("B");
-                        this.cList.Items.Add("B");
-                    } else {
-                        this.cList.Visibility = Visibility.Visible;
-                        this.cList.Focus();
-                        this.cList.Items.Add("A");
-                        this.cList.Items.Add("A");
-                        this.cList.Items.Add("A");
-                        this.cList.Items.Add("A");
-                        this.cList.Items.Add("A");
-                        this.cList.Items.Add("A");
-                        this.cList.Items.Add("A");
-                    }
                     e.Handled = true;
+                    this.ComplementPath();
                     break;
 
                 case Key.Up:
                     if (Common.IsModifierPressed(ModifierKeys.Control)) {
-                        e.Handled = true;
-                        if (0 < this._commandBuf.Count) {
-                            this.ShowCommandLine?.Invoke(this._commandBuf);
-                        }
+                        //e.Handled = true;
+                        //if (0 < this._commandBuf.Count) {
+                        //    this.ShowCommandLine?.Invoke(this._commandBuf);
+                        //}
                     } else {
                         this._buffIndex++;
                         if (this.SetBufferCommand()) {
@@ -158,14 +97,6 @@ namespace MyCmd.Component {
                     break;
             }
         }
-
-        /// <summary>
-        /// std data received
-        /// </summary>
-        /// <param name="line"></param>
-        private void DataReceived(bool isUtf8, string line) {
-            this.AddLine(line);
-        }
         #endregion
 
         #region Private Method
@@ -173,8 +104,6 @@ namespace MyCmd.Component {
         /// initialize
         /// </summary>
         private void Initialize() {
-            // initialize component
-            this._cmd = new CmdWrap(this);
             this.cResult.Document = this._flowDoc;
 
             // set background
@@ -183,12 +112,18 @@ namespace MyCmd.Component {
 
             // Add Event
             this.Loaded += (sender, e) => {
+                this.cPageList.Visibility = Visibility.Collapsed;
                 this.cCommand.Focus();
             };
-            this._cmd.CmdEvent += DataReceived;
-
-            // start process
-            this._cmd.Start();
+            this.cPageList.DataSelected += (isCancel, data) => {
+                this.cPageList.Visibility = Visibility.Collapsed;
+                this.cCommand.Focus();
+                if (!isCancel) {
+                    var p = this.cPageList.Tag as List<string>;
+                    this.cPageList.Tag = null;
+                    this.AddPath(p[0], p[1], p[2] +data);
+                }
+            };
         }
 
         /// <summary>
@@ -228,6 +163,65 @@ namespace MyCmd.Component {
             }
             this.cCommand.Text = this._commandBuf[this._buffIndex];
             return true;
+        }
+
+        /// <summary>
+        /// complement path
+        /// </summary>
+        private void ComplementPath() {
+            var command = this.cCommand.Text.Trim();
+
+            string rest = "";
+            string fragment = "";
+            string path;
+            var pos = command.LastIndexOf(" ");
+            if (-1 == pos) {
+                path = command;
+            } else {
+                rest = command.Substring(0, pos);
+                path = command.Substring(pos + 1);
+            }
+            if (!PathUtil.IsAbsolute(path)) {
+                fragment = this.CurrentPath;
+            }
+
+            var file = new PathUtil(fragment + path);
+            switch(file.FileType) {
+                case PathUtil.FileTypes.Directory:
+                case PathUtil.FileTypes.ValidDirectry:
+                    break;
+                default:
+                    return;
+            }
+            var list = file.GetChildren();
+            if (null == list) {
+                return;
+            }
+
+            if (1 == list.Count) {
+                this.AddPath(rest, fragment, path + list[0].Name);
+                return;
+            } else {
+                this.cPageList.Tag = new List<string> {rest, fragment, path };
+                this.cPageList.Visibility = Visibility.Visible;
+                this.cPageList.Setup(list);
+                Util.DoEvents();
+                this.cPageList.SetFocus();
+            }
+        }
+
+        /// <summary>
+        /// add commplement path
+        /// </summary>
+        /// <param name="rest">rest part of command</param>
+        /// <param name="fragment">fragment</param>
+        /// <param name="path">add path</param>
+        private void AddPath(string rest, string fragment, string val) {
+            if (new PathUtil(fragment + val).IsDirectory) {
+                val += @"\";
+            }
+            this.cCommand.Text = $"{rest.Trim()} {val}";
+            this.cCommand.SelectionStart = this.cCommand.Text.Length;
         }
         #endregion
 

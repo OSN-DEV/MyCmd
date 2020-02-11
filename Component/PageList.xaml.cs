@@ -1,10 +1,12 @@
 ﻿using MyCmd.AppUtil;
 using MyCmd.Data;
 using OsnCsLib.Common;
+using OsnCsLib.File;
 using OsnCsLib.WPFComponent;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,6 +22,7 @@ namespace MyCmd.Component {
         private int _currentPage = 0;
         private int _TotalPage = 0;
         List<PageListViewModel> _listData;
+
         #endregion
 
         #region Public Event
@@ -67,9 +70,9 @@ namespace MyCmd.Component {
             void ShowPage(bool nextPage) {
                 Handled();
                 if (nextPage) {
-                    this._currentPage = Util.GetNextPage(this._currentPage, this._TotalPage);
+                    this._currentPage = PageUtil.GetNextPage(this._currentPage, this._TotalPage);
                 } else {
-                    this._currentPage = Util.GetPrevPage(this._currentPage, this._TotalPage);
+                    this._currentPage = PageUtil.GetPrevPage(this._currentPage, this._TotalPage);
                 }
                 this.ShowCurrentPage();
             }
@@ -112,7 +115,7 @@ namespace MyCmd.Component {
                 case Key.Enter:
                     Handled();
                     var item = this.cListData.SelectedItem as PageListViewModel;
-                    this.DataSelected?.Invoke(true, item?.DisplayName);
+                    this.DataSelected?.Invoke(false, item?.DisplayName);
                     break;
 
                 case Key.D1:
@@ -124,7 +127,7 @@ namespace MyCmd.Component {
                     if (index < this.cListData.Items.Count) {
                         Handled();
                         var list = this.cListData.DataContext as ObservableCollection<PageListViewModel>;
-                        this.DataSelected?.Invoke(true, list[index].DisplayName);
+                        this.DataSelected?.Invoke(false, list[index].DisplayName);
                     }
                     break;
             }
@@ -139,12 +142,28 @@ namespace MyCmd.Component {
             if (!(cListData.GetItemAt(Mouse.GetPosition(this.cListData))?.DataContext is PageListViewModel item)) {
                 return;
             }
-            this.DataSelected?.Invoke(true, item?.DisplayName);
+            this.DataSelected?.Invoke(false, item?.DisplayName);
         }
 
         #endregion
 
         #region Public Method
+
+        /// <summary>
+        /// set up list data
+        /// </summary>
+        /// <param name="src"></param>
+        public void Setup(List<PathInfo> src) {
+            var list = new List<PageListViewModel>();
+            foreach(var info in src) {
+                list.Add(new PageListViewModel() {
+                    DisplayName = info.Name,
+                    Icon = ImageUtil.GetIcon(info.BasePath)
+                });
+            }
+            this.Setup(list);
+        }
+
         /// <summary>
         /// set up list data
         /// </summary>
@@ -152,8 +171,16 @@ namespace MyCmd.Component {
         public void Setup(List<PageListViewModel> src) {
             this._listData = src;
             this._currentPage = 0;
-            this._TotalPage = Util.CalcPageCount(this._listData.Count, CountPerPage);
+            this._TotalPage = PageUtil.CalcPageCount(this._listData.Count, CountPerPage);
             this.ShowCurrentPage();
+        }
+
+        /// <summary>
+        /// set focus to list
+        /// </summary>
+        public void SetFocus() {
+            this.cListData.SelectedIndex = 0;
+            this.cListData.Focus();
         }
         #endregion
 
@@ -163,17 +190,18 @@ namespace MyCmd.Component {
         /// </summary>
         private void Initialize() {
             this.cPage.Foreground = ColorDef.PageListForeground;
+            this.cPage.Background = ColorDef.PageListBackground;
             this.Background = ColorDef.PageListBackground;
 
             this.cListData.DataContext = new ObservableCollection<PageListViewModel>();
 
-            var data = new List<PageListViewModel>();
-            for (int i = 0; i < 21; i++) {
-                data.Add(new PageListViewModel() {
-                    DisplayName = i.ToString() + "item"
-                });
-            }
-            this.Setup(data);
+            //var data = new List<PageListViewModel>();
+            //for (int i = 0; i < 21; i++) {
+            //    data.Add(new PageListViewModel() {
+            //        DisplayName = i.ToString() + "item"
+            //    });
+            //}
+            //this.Setup(data);
         }
 
         /// <summary>

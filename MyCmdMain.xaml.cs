@@ -1,24 +1,12 @@
-﻿using MyCmd.Component;
+﻿using MyCmd.AppUtil;
+using MyCmd.Component;
 using MyCmd.Data;
-using MyCmd.AppUtil;
-using System;
+using MyLib.Util;
+using OsnCsLib.WPFComponent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
-using MyLib.Util;
 
 namespace MyCmd {
     /// <summary>
@@ -116,9 +104,9 @@ namespace MyCmd {
                 this._settings.Size.W = this.Width;
                 this._settings.Save();
 
-                foreach (var console in this._consoleList) {
-                    console.CloseProc(true);
-                }
+                //foreach (var console in this._consoleList) {
+                //    console.CloseProc(true);
+                //}
             };
             this.cTab.TabChanged += (index) => {
                 for(int i=0; i < this._consoleList.Count; i++) {
