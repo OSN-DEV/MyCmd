@@ -34,7 +34,12 @@ namespace MyCmd.AppUtil {
         /// console text color
         /// </summary>
 //        internal static readonly Brush CosoleForecground = GetBrushFromHex("#FFFFFF");
-        internal static readonly Brush CosoleForecground = GetBrushFromHex("#626264");
+        internal static readonly Brush ConsoleForeground = GetBrushFromHex("#626264");
+
+        /// <summary>
+        /// console error text color
+        /// </summary>
+        internal static readonly Brush ConsoleErrorForeground = GetBrushFromHex("#FF0000");
 
         /// <summary>
         /// console background color
@@ -69,5 +74,12 @@ namespace MyCmd.AppUtil {
         private static SolidColorBrush GetBrushFromHex(string color) {
             return new SolidColorBrush((System.Windows.Media.Color)ColorConverter.ConvertFromString(color));
         }
+    }
+
+    /// <summary>
+    /// error message
+    /// </summary>
+    internal static class ErrorMessage {
+        internal static readonly string InvalidCommand = "invalid command";
     }
 }

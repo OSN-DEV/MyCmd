@@ -1,4 +1,5 @@
 ﻿using MyCmd.AppUtil;
+using MyCmd.Command;
 using MyLib.Util;
 using OsnCsLib.Common;
 using OsnCsLib.File;
@@ -8,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+
 
 namespace MyCmd.Component {
     // https://qiita.com/skitoy4321/items/10c47eea93e5c6145d48
@@ -23,6 +25,10 @@ namespace MyCmd.Component {
         private int _buffIndex = 0;
 
         private readonly FlowDocument _flowDoc = new FlowDocument();
+
+        private List<CommandBase> _commandList = new List< CommandBase>() {
+            { new CdCommand() }
+        };
         #endregion
 
         #region Constructor
@@ -40,7 +46,7 @@ namespace MyCmd.Component {
         /// <summary>
         /// current absolute path
         /// </summary>
-        public string CurrentPath { set; get; } = Environment.CurrentDirectory;
+        public string CurrentPath { set; get; } = StringUtil.AddLast(Environment.CurrentDirectory,@"\");
         #endregion
 
         #region Public Method
@@ -64,7 +70,7 @@ namespace MyCmd.Component {
                             this._commandBuf.RemoveAt(0);
                         }
                     }
-                    //this._cmd.SendCommand(this.cCommand.Text);
+                    this.SendCommand();
                     this.cCommand.Text = "";
                     break;
 
@@ -97,6 +103,28 @@ namespace MyCmd.Component {
                     break;
             }
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="command"></param>
+        /// <param name="data"></param>
+        /// <param name="userData"></param>
+        private void CommandErrorReceived(string key, string command, string data, object userData) {
+            
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="command"></param>
+        /// <param name="data"></param>
+        /// <param name="userData"></param>
+        private void CommandDataReceived(string key, string command, string data, object userData) {
+
+        }
         #endregion
 
         #region Private Method
@@ -107,7 +135,7 @@ namespace MyCmd.Component {
             this.cResult.Document = this._flowDoc;
 
             // set background
-            this.cResult.Foreground = ColorDef.CosoleForecground;
+            this.cResult.Foreground = ColorDef.ConsoleForeground;
             this.cResult.Background = ColorDef.ConsoleBackground;
 
             // Add Event
@@ -124,15 +152,26 @@ namespace MyCmd.Component {
                     this.AddPath(p[0], p[1], p[2] +data);
                 }
             };
+            foreach(var command in this._commandList) {
+                command.DataReceived += CommandDataReceived;
+                command.ErrorReceived += CommandErrorReceived;
+            }
+
         }
 
         /// <summary>
         /// add line
         /// </summary>
         /// <param name="line">line</param>
-        private void AddLine(string line) {
+        /// <param name="isError">true: error message, false: otherwise</param>
+        private void AddLine(string line, bool isError = false) {
             this.cResult.Dispatcher.Invoke(() => {
                 if (0 == _flowDoc.Blocks.Count) {
+                    if (isError) {
+                        this.cResult.SelectionTextBrush = ColorDef.ConsoleErrorForeground;
+                    } else {
+                        this.cResult.SelectionTextBrush = ColorDef.ConsoleForeground;
+                    }
                     var p = new Paragraph();
                     p.Inlines.Add(new Run(line));
                     _flowDoc.Blocks.Add(p);
@@ -188,7 +227,9 @@ namespace MyCmd.Component {
             var file = new PathUtil(fragment + path);
             switch(file.FileType) {
                 case PathUtil.FileTypes.Directory:
+                    break;
                 case PathUtil.FileTypes.ValidDirectry:
+                    path = StringUtil.RemoveFromLast(path, @"\");
                     break;
                 default:
                     return;
@@ -220,8 +261,46 @@ namespace MyCmd.Component {
             if (new PathUtil(fragment + val).IsDirectory) {
                 val += @"\";
             }
-            this.cCommand.Text = $"{rest.Trim()} {val}";
+            this.cCommand.Text = $"{rest.Trim()} {val}".TrimStart();
             this.cCommand.SelectionStart = this.cCommand.Text.Length;
+        }
+
+        /// <summary>
+        /// send command
+        /// </summary>
+        private void SendCommand() {
+            var commandLine = this.cCommand.Text.TrimStart();
+            this.AddLine("> " + commandLine);
+
+
+            foreach (var command in this._commandList) {
+                if (command.IsMatch(this.cCommand.Text)) {
+                    command.RunCommand(commandLine);
+                    return;
+                }
+            }
+
+            // if command is single, try run app if possible
+            bool runApp() {
+                if (-1 != commandLine.IndexOf(" ")) {
+                    return false;
+                }
+                var path = commandLine;
+                if (!PathUtil.IsAbsolute(path)) {
+                    path = this.CurrentPath + path;
+                }
+                if (!new PathUtil(path).IsFile) {
+                    return false;
+                }
+                if (!Util.RunApp(path)) {
+                    return false;
+                }
+
+                return true;
+            };
+            if (!runApp()) {
+                this.AddLine(ErrorMessage.InvalidCommand, true);
+            }
         }
         #endregion
 

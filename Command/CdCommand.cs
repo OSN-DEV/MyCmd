@@ -15,7 +15,7 @@ namespace MyCmd.Command {
         /// <summary>
         /// command key
         /// </summary>
-        public static string Key {
+        public override string Key {
             get { return "cd"; }
         }
 
@@ -41,8 +41,19 @@ namespace MyCmd.Command {
                 this.Args = match.Groups["args"].ToString();
                 return true;
             } else {
-                return command.StartsWith(CdCommand.Key);
+                return command.StartsWith(this.Key);
             }
+        }
+
+        #endregion
+
+        #region Protected
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="command"></param>
+        protected override void RunCommand(string command) {
+
         }
         #endregion
     }
