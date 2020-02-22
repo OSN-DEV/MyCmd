@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using OsnCsLib.Common;
+using OsnCsLib.File;
+using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace MyCmd.Command {
     class CdCommand : CommandBase {
@@ -11,13 +10,15 @@ namespace MyCmd.Command {
         private static Regex regex = new Regex(@"cd (?<args>.+?)(?=\s)|cd (?<args>.+)");
         #endregion
 
+        #region PublicField
+        public static readonly string Key = "cd";
+        #endregion
+
         #region Public Property
         /// <summary>
         /// command key
         /// </summary>
-        public override string Key {
-            get { return "cd"; }
-        }
+        public override string CommandKey { get => Key; }
 
         /// <summary>
         /// args
@@ -26,25 +27,6 @@ namespace MyCmd.Command {
         #endregion
 
         #region Public Method
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="command"></param>
-        /// <returns></returns>
-        public override bool IsMatch(string command) {
-            this.Args = "";
-            if (2 < command.Split(' ').Length) {
-                return false;
-            }
-            var match = regex.Match(command);
-            if (match.Success) {
-                this.Args = match.Groups["args"].ToString();
-                return true;
-            } else {
-                return command.StartsWith(this.Key);
-            }
-        }
-
         #endregion
 
         #region Protected
@@ -53,7 +35,32 @@ namespace MyCmd.Command {
         /// </summary>
         /// <param name="command"></param>
         protected override void RunCommand(string command) {
+            if (0 == this.Args?.Length) {
+                base.RaiseDataReceivedOnce(this.CurrentPath);
+                return;
+            }
 
+            var path = new PathUtil(this.CurrentPath, this.Args);
+
+
+        }
+        #endregion
+
+        #region Private Method
+        /// <summary>
+        /// parse command
+        /// </summary>
+        /// <param name="command">command</param>
+        /// <returns>true:valid command, false: otherwise</returns>
+        protected override bool Parse(string command) {
+            this.Args = "";
+            var match = regex.Match(command);
+            if (match.Success) {
+                this.Args = match.Groups["args"].ToString().Trim();
+                return true;
+            } else {
+                return command.StartsWith(Key);
+            }
         }
         #endregion
     }

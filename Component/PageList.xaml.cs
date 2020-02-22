@@ -21,18 +21,19 @@ namespace MyCmd.Component {
         private const int CountPerPage = 5;
         private int _currentPage = 0;
         private int _TotalPage = 0;
-        List<PageListViewModel> _listData;
-
+        private List<PageListViewModel> _listData;
+        private object _userData = null;
         #endregion
 
         #region Public Event
         /// <summary>
-        /// raise event when data is selected or canceld
+        /// raise event when data is selected 
         /// </summary>
-        /// <param name="isCancel">true:selection canceled, false:otherwise</param>
-        /// <param name="data">selected text, if canceled set empty string</param>
-        public delegate void DataSelectedHander(bool isCancel, string data);
+        /// <param name="selection">selected text, if canceled set empty string</param>
+        /// <param name="userData">user data</param>
+        public delegate void DataSelectedHander(string selection, object userData);
         public event DataSelectedHander DataSelected;
+        public event EventHandler Canceled;
         #endregion
 
         #region Constructor
@@ -109,13 +110,13 @@ namespace MyCmd.Component {
 
                 case Key.Escape:
                     Handled();
-                    this.DataSelected?.Invoke(true, "");
+                    this.Canceled?.Invoke(null, null);
                     break;
 
                 case Key.Enter:
                     Handled();
                     var item = this.cListData.SelectedItem as PageListViewModel;
-                    this.DataSelected?.Invoke(false, item?.DisplayName);
+                    this.RaiseDataSelected(item?.DisplayName);
                     break;
 
                 case Key.D1:
@@ -127,7 +128,7 @@ namespace MyCmd.Component {
                     if (index < this.cListData.Items.Count) {
                         Handled();
                         var list = this.cListData.DataContext as ObservableCollection<PageListViewModel>;
-                        this.DataSelected?.Invoke(false, list[index].DisplayName);
+                        this.RaiseDataSelected(list[index].DisplayName);
                     }
                     break;
             }
@@ -142,36 +143,36 @@ namespace MyCmd.Component {
             if (!(cListData.GetItemAt(Mouse.GetPosition(this.cListData))?.DataContext is PageListViewModel item)) {
                 return;
             }
-            this.DataSelected?.Invoke(false, item?.DisplayName);
+            this.RaiseDataSelected(item?.DisplayName);
         }
 
         #endregion
 
         #region Public Method
-
         /// <summary>
         /// set up list data
         /// </summary>
         /// <param name="src"></param>
-        public void Setup(List<PathInfo> src) {
+        public void Setup(List<PathInfo> src, object userData = null) {
             var list = new List<PageListViewModel>();
-            foreach(var info in src) {
+            foreach (var info in src) {
                 list.Add(new PageListViewModel() {
                     DisplayName = info.Name,
                     Icon = ImageUtil.GetIcon(info.BasePath)
                 });
             }
-            this.Setup(list);
+            this.Setup(list, userData);
         }
 
         /// <summary>
         /// set up list data
         /// </summary>
         /// <param name="src"></param>
-        public void Setup(List<PageListViewModel> src) {
+        public void Setup(List<PageListViewModel> src, object userData = null) {
             this._listData = src;
             this._currentPage = 0;
             this._TotalPage = PageUtil.CalcPageCount(this._listData.Count, CountPerPage);
+            this._userData = userData;
             this.ShowCurrentPage();
         }
 
@@ -217,6 +218,15 @@ namespace MyCmd.Component {
             for (var i = start; i < end; i++) {
                 list.Add(this._listData[i]);
             }
+        }
+
+        /// <summary>
+        /// raise DataSelected event
+        /// </summary>
+        /// <param name="isCancel"></param>
+        /// <param name="selection"></param>
+        private void RaiseDataSelected(string selection) {
+            this.DataSelected?.Invoke(selection, this._userData);
         }
         #endregion
     }

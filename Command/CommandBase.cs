@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using OsnCsLib.Common;
 
 namespace MyCmd.Command {
     internal abstract class CommandBase {
@@ -17,13 +18,19 @@ namespace MyCmd.Command {
         /// <summary>
         /// command key
         /// </summary>
-        public abstract string Key { get; }
+        public abstract string  CommandKey { get; }
+
+        /// <summary>
+        /// current absolute path
+        /// </summary>
+        public string CurrentPath { set; get; }
         #endregion
 
         #region Public Event
         public delegate void CommandEventHandler(string key, string command,  string data, object userData);
         public event CommandEventHandler DataReceived;
         public event CommandEventHandler ErrorReceived;
+        public event CommandEventHandler CommandEnd;
         #endregion
 
         #region Public Method
@@ -32,7 +39,7 @@ namespace MyCmd.Command {
         /// </summary>
         /// <param name="command">comand that checks</param>
         /// <returns>true:match, false:otherwise</returns>
-        public abstract bool IsMatch(string command);
+        public bool IsMatch(string command) => this.Parse(command);
 
         /// <summary>
         /// Run command
@@ -42,6 +49,7 @@ namespace MyCmd.Command {
         public  void RunCommand(string command, object userData = null) {
             this._command = command;
             this._userData = userData;
+            this.RunCommand(command);
         }
         #endregion
 
@@ -57,7 +65,16 @@ namespace MyCmd.Command {
         /// </summary>
         /// <param name="data">data</param>
         protected void RaiseDataReceived(string data) {
-            this.DataReceived?.Invoke(this.Key, this._command, data, this._userData);
+            this.DataReceived?.Invoke(this.CommandKey, this._command, data, this._userData);
+        }
+
+        /// <summary>
+        /// raise DataReceived event.
+        /// </summary>
+        /// <param name="data">data</param>
+        protected void RaiseDataReceivedOnce(string data) {
+            this.DataReceived?.Invoke(this.CommandKey, this._command, data, this._userData);
+            this.CommandEnd?.Invoke(this.CommandKey, this._command, "", this._userData);
         }
 
         /// <summary>
@@ -65,8 +82,22 @@ namespace MyCmd.Command {
         /// </summary>
         /// <param name="data">data</param>
         protected void RaiseErrorReceived(string data) {
-            this.ErrorReceived?.Invoke(this.Key, this._command, data, this._userData);
+            this.ErrorReceived?.Invoke(this.CommandKey, this._command, data, this._userData);
         }
+
+        /// <summary>
+        /// raise CommandEnd event
+        /// </summary>
+        protected void RaiseCommandEnd() {
+            this.CommandEnd?.Invoke(this.CommandKey, this._command, "", this._userData);
+        }
+
+        /// <summary>
+        /// parse command
+        /// </summary>
+        /// <param name="command">command</param>
+        /// <returns>true:valid command, false: otherwise</returns>
+        protected abstract bool Parse(string command);
         #endregion
     }
 }

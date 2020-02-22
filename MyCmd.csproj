@@ -66,6 +66,7 @@
     <Compile Include="AppUtil\NativeMethods.cs" />
     <Compile Include="Command\CdCommand.cs" />
     <Compile Include="Command\CommandBase.cs" />
+    <Compile Include="Command\LsCommand.cs" />
     <Compile Include="Component\CmdProcess.cs" />
     <Compile Include="Component\CmdWrap.cs" />
     <Compile Include="Component\PageList.xaml.cs">

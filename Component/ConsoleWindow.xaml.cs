@@ -26,9 +26,8 @@ namespace MyCmd.Component {
 
         private readonly FlowDocument _flowDoc = new FlowDocument();
 
-        private List<CommandBase> _commandList = new List< CommandBase>() {
-            { new CdCommand() }
-        };
+        private List<CommandBase> _commandList;
+        private PathUtil _path = new PathUtil(System.Environment.CurrentDirectory, @"\");
         #endregion
 
         #region Constructor
@@ -38,15 +37,10 @@ namespace MyCmd.Component {
         public ConsoleWindow() {
             InitializeComponent();
             this.Initialize();
-            this.AddLine(this.CurrentPath);
         }
         #endregion
 
         #region Public Property
-        /// <summary>
-        /// current absolute path
-        /// </summary>
-        public string CurrentPath { set; get; } = StringUtil.AddLast(Environment.CurrentDirectory,@"\");
         #endregion
 
         #region Public Method
@@ -54,7 +48,7 @@ namespace MyCmd.Component {
 
         #region Event
         private void Command_KeyDown(object sender, KeyEventArgs e) {
-            AppCommon.DebugLog("key"  + e.Key.ToString());
+            AppCommon.DebugLog("key" + e.Key.ToString());
             switch (e.Key) {
                 case Key.Enter:
                     if (0 == this.cCommand.Text.Length) {
@@ -103,7 +97,7 @@ namespace MyCmd.Component {
                     break;
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -112,7 +106,7 @@ namespace MyCmd.Component {
         /// <param name="data"></param>
         /// <param name="userData"></param>
         private void CommandErrorReceived(string key, string command, string data, object userData) {
-            
+            this.AddLine(data);
         }
 
         /// <summary>
@@ -123,7 +117,18 @@ namespace MyCmd.Component {
         /// <param name="data"></param>
         /// <param name="userData"></param>
         private void CommandDataReceived(string key, string command, string data, object userData) {
+            this.AddLine(data);
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="command"></param>
+        /// <param name="data"></param>
+        /// <param name="userData"></param>
+        private void CommandEnd(string key, string command, string data, object userData) {
+            this.AddLine("");
         }
         #endregion
 
@@ -138,24 +143,38 @@ namespace MyCmd.Component {
             this.cResult.Foreground = ColorDef.ConsoleForeground;
             this.cResult.Background = ColorDef.ConsoleBackground;
 
+
+            // set command list
+            this._commandList = new List<CommandBase>() {
+                new CdCommand(),
+                new LsCommand()
+            };
+
             // Add Event
             this.Loaded += (sender, e) => {
                 this.cPageList.Visibility = Visibility.Collapsed;
                 this.cCommand.Focus();
             };
-            this.cPageList.DataSelected += (isCancel, data) => {
+            this.cPageList.DataSelected += (selection, userData) => {
                 this.cPageList.Visibility = Visibility.Collapsed;
                 this.cCommand.Focus();
-                if (!isCancel) {
-                    var p = this.cPageList.Tag as List<string>;
-                    this.cPageList.Tag = null;
-                    this.AddPath(p[0], p[1], p[2] +data);
-                }
+                this._path.SetAddironalPath(selection);
+                this.AddPath(userData.ToString(), "");
             };
-            foreach(var command in this._commandList) {
+            this.cPageList.Canceled += (sender, e) => {
+                this.cPageList.Visibility = Visibility.Collapsed;
+                this.cCommand.Focus();
+            };
+            foreach (var command in this._commandList) {
                 command.DataReceived += CommandDataReceived;
                 command.ErrorReceived += CommandErrorReceived;
+                command.CommandEnd += CommandEnd;
             }
+
+
+            //
+            this.AddLine(this._path.CurrentPath);
+            this.AddLine("");
 
         }
 
@@ -211,7 +230,6 @@ namespace MyCmd.Component {
             var command = this.cCommand.Text.Trim();
 
             string rest = "";
-            string fragment = "";
             string path;
             var pos = command.LastIndexOf(" ");
             if (-1 == pos) {
@@ -220,32 +238,27 @@ namespace MyCmd.Component {
                 rest = command.Substring(0, pos);
                 path = command.Substring(pos + 1);
             }
-            if (!PathUtil.IsAbsolute(path)) {
-                fragment = this.CurrentPath;
-            }
-
-            var file = new PathUtil(fragment + path);
-            switch(file.FileType) {
+            this._path.SetAddironalPath(path);
+            switch (this._path.FileType) {
                 case PathUtil.FileTypes.Directory:
                     break;
                 case PathUtil.FileTypes.ValidDirectry:
-                    path = StringUtil.RemoveFromLast(path, @"\");
+                    //path = StringUtil.RemoveFromLast(path, @"\");
                     break;
                 default:
                     return;
             }
-            var list = file.GetChildren();
+            var list = this._path.GetChildren();
             if (null == list) {
                 return;
             }
 
             if (1 == list.Count) {
-                this.AddPath(rest, fragment, path + list[0].Name);
+                this.AddPath(rest, list[0].Name);
                 return;
             } else {
-                this.cPageList.Tag = new List<string> {rest, fragment, path };
                 this.cPageList.Visibility = Visibility.Visible;
-                this.cPageList.Setup(list);
+                this.cPageList.Setup(list, rest);
                 Util.DoEvents();
                 this.cPageList.SetFocus();
             }
@@ -255,13 +268,12 @@ namespace MyCmd.Component {
         /// add commplement path
         /// </summary>
         /// <param name="rest">rest part of command</param>
-        /// <param name="fragment">fragment</param>
         /// <param name="path">add path</param>
-        private void AddPath(string rest, string fragment, string val) {
-            if (new PathUtil(fragment + val).IsDirectory) {
+        private void AddPath(string rest, string val) {
+            if (this._path.IsDirectory) {
                 val += @"\";
             }
-            this.cCommand.Text = $"{rest.Trim()} {val}".TrimStart();
+            this.cCommand.Text = $"{rest.Trim()} {this._path.AdditionalPath}{val}".TrimStart();
             this.cCommand.SelectionStart = this.cCommand.Text.Length;
         }
 
@@ -274,7 +286,8 @@ namespace MyCmd.Component {
 
 
             foreach (var command in this._commandList) {
-                if (command.IsMatch(this.cCommand.Text)) {
+                if (command.IsMatch(commandLine)) {
+                    command.CurrentPath = this._path.CurrentPath;
                     command.RunCommand(commandLine);
                     return;
                 }
@@ -285,14 +298,12 @@ namespace MyCmd.Component {
                 if (-1 != commandLine.IndexOf(" ")) {
                     return false;
                 }
-                var path = commandLine;
-                if (!PathUtil.IsAbsolute(path)) {
-                    path = this.CurrentPath + path;
-                }
-                if (!new PathUtil(path).IsFile) {
+
+                var file = new PathUtil(this._path.CurrentPath, commandLine);
+                if (!file.IsFile) {
                     return false;
                 }
-                if (!Util.RunApp(path)) {
+                if (!Util.RunApp(file.Path)) {
                     return false;
                 }
 

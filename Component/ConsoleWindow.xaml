@@ -11,7 +11,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <RichTextBox Grid.Row="0" Name="cResult" FontFamily="Meiryo UI" FontSize="14" DockPanel.Dock="Top" IsReadOnly="True" />
+        <RichTextBox Grid.Row="0" Name="cResult" FontFamily="Meiryo UI" FontSize="14" DockPanel.Dock="Top" IsReadOnly="True" Block.LineHeight="1"/>
         <local:PageList x:Name="cPageList" Grid.Row="0" VerticalAlignment="Bottom" Margin="1 0" />
 
         <TextBox Padding="5" Grid.Row="1" Name="cCommand" DockPanel.Dock="Bottom" Block.LineHeight="1" FontSize="14" PreviewKeyDown="Command_KeyDown" Background="#EBEEF5" />
