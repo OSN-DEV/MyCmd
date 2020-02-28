@@ -1,4 +1,5 @@
-﻿using OsnCsLib.Common;
+﻿using MyCmd.AppUtil;
+using OsnCsLib.Common;
 using OsnCsLib.File;
 using System;
 using System.Text.RegularExpressions;
@@ -41,8 +42,12 @@ namespace MyCmd.Command {
             }
 
             var path = new PathUtil(this.CurrentPath, this.Args);
+            if (!path.IsFile && !path.IsDirectory) {
+                base.RaiseErrorReceivedOnce(ErrorMessage.InvalidPath);
+                return;
+            }
 
-
+            base.RaiseDataReceivedOnce(path.Path);
         }
         #endregion
 

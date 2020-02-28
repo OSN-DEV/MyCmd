@@ -86,6 +86,15 @@ namespace MyCmd.Command {
         }
 
         /// <summary>
+        /// raise RaiseErrorReceived event
+        /// </summary>
+        /// <param name="data">data</param>
+        protected void RaiseErrorReceivedOnce(string data) {
+            this.ErrorReceived?.Invoke(this.CommandKey, this._command, data, this._userData);
+            this.CommandEnd?.Invoke(this.CommandKey, this._command, "", this._userData);
+        }
+
+        /// <summary>
         /// raise CommandEnd event
         /// </summary>
         protected void RaiseCommandEnd() {

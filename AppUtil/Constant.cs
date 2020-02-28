@@ -81,5 +81,6 @@ namespace MyCmd.AppUtil {
     /// </summary>
     internal static class ErrorMessage {
         internal static readonly string InvalidCommand = "invalid command";
+        internal static readonly string InvalidPath = "invalid path";
     }
 }

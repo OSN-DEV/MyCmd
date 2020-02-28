@@ -118,6 +118,9 @@ namespace MyCmd.Component {
         /// <param name="userData"></param>
         private void CommandDataReceived(string key, string command, string data, object userData) {
             this.AddLine(data);
+            if (CdCommand.Key == key) {
+                this._path.SetPath(data);
+            }
         }
 
         /// <summary>
@@ -243,7 +246,7 @@ namespace MyCmd.Component {
                 case PathUtil.FileTypes.Directory:
                     break;
                 case PathUtil.FileTypes.ValidDirectry:
-                    //path = StringUtil.RemoveFromLast(path, @"\");
+                    this._path.CollectAdditionalPath();
                     break;
                 default:
                     return;
@@ -252,6 +255,7 @@ namespace MyCmd.Component {
             if (null == list) {
                 return;
             }
+
 
             if (1 == list.Count) {
                 this.AddPath(rest, list[0].Name);

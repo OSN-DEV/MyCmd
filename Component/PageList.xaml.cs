@@ -158,7 +158,7 @@ namespace MyCmd.Component {
             foreach (var info in src) {
                 list.Add(new PageListViewModel() {
                     DisplayName = info.Name,
-                    Icon = ImageUtil.GetIcon(info.BasePath)
+                    Icon = ImageUtil.GetIcon(info.Path)
                 });
             }
             this.Setup(list, userData);
