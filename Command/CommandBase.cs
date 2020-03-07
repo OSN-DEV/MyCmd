@@ -49,7 +49,9 @@ namespace MyCmd.Command {
         public  void RunCommand(string command, object userData = null) {
             this._command = command;
             this._userData = userData;
-            this.RunCommand(command);
+            Task.Run(() => {
+                this.RunCommand(command);
+            });
         }
         #endregion
 

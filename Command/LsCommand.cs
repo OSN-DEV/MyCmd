@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OsnCsLib.File;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,12 +17,20 @@ namespace MyCmd.Command {
         /// command key
         /// </summary>
         public override string CommandKey { get => Key; }
+
+        public List<string> Options { set; get; } = new List<string>();
         #endregion
 
 
         #region Public Method
         protected override void RunCommand(string command) {
-            base.RaiseDataReceived("aaa bbb ccc ddd eee fff ggg hhh iii jjj kkk lll mmm nnn ooo ppp qqq rrr");
+            var chidren = new PathUtil(this.CurrentPath).GetChildren();
+
+            var data = new StringBuilder();
+            foreach(var child in chidren) {
+                data.Append(child.Name).Append("  ");
+            }
+            base.RaiseDataReceived(data.ToString().Trim());
         }
         #endregion
 
@@ -32,7 +41,14 @@ namespace MyCmd.Command {
         /// <param name="command">command</param>
         /// <returns>true:valid command, false: otherwise</returns>
         protected override bool Parse(string command) {
-            return true;
+            this.Options.Clear();
+            var optionsBase = command.Split(' ');
+            foreach(var option in optionsBase) {
+                if ("" != option && Key != option) {
+                    this.Options.Add(option);
+                }
+            }
+            return (Key == command || command.StartsWith(Key + " "));
         }
         #endregion
     }
