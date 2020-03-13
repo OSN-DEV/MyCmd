@@ -27,8 +27,10 @@ namespace MyCmd.Command {
             var chidren = new PathUtil(this.CurrentPath).GetChildren();
 
             var data = new StringBuilder();
-            foreach(var child in chidren) {
-                data.Append(child.Name).Append("  ");
+            if (0 == this.Options.Count) {
+                foreach (var child in chidren) {
+                    data.Append(child.Name).Append("  ");
+                }
             }
             base.RaiseDataReceived(data.ToString().Trim());
         }

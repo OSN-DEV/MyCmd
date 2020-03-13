@@ -41,6 +41,11 @@ namespace MyCmd.Command {
                 return;
             }
 
+            if (this.Args == "/") {
+                base.RaiseDataReceivedOnce(this.CurrentPath.Substring(0,2));
+                return;
+            }
+
             var path = new PathUtil(this.CurrentPath, this.Args);
             if (!path.IsFile && !path.IsDirectory) {
                 base.RaiseErrorReceivedOnce(ErrorMessage.InvalidPath);

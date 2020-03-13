@@ -188,12 +188,8 @@ namespace MyCmd.Component {
         /// <param name="isError">true: error message, false: otherwise</param>
         private void AddLine(string line, bool isError = false) {
             this.cResult.Dispatcher.Invoke(() => {
+                
                 if (0 == _flowDoc.Blocks.Count) {
-                    if (isError) {
-                        this.cResult.SelectionTextBrush = ColorDef.ConsoleErrorForeground;
-                    } else {
-                        this.cResult.SelectionTextBrush = ColorDef.ConsoleForeground;
-                    }
                     var p = new Paragraph();
                     p.Inlines.Add(new Run(line));
                     _flowDoc.Blocks.Add(p);
@@ -201,7 +197,14 @@ namespace MyCmd.Component {
                         _flowDoc.Blocks.Remove(_flowDoc.Blocks.FirstBlock);
                     }
                 } else {
-                    ((Paragraph)_flowDoc.Blocks.FirstBlock).Inlines.Add(new Run('\n' + line));
+                    var r = new Run('\n' + line);
+                    if (isError) {
+                        r.Foreground = ColorDef.ConsoleErrorForeground;
+                    } else {
+                        r.Foreground = ColorDef.ConsoleForeground;
+                    }
+                    // ((Paragraph)_flowDoc.Blocks.FirstBlock).Inlines.Add(new Run('\n' + line));
+                    ((Paragraph)_flowDoc.Blocks.FirstBlock).Inlines.Add(r);
                 }
                 this.cResult.ScrollToEnd();
                 System.Windows.Forms.Application.DoEvents();
@@ -315,6 +318,7 @@ namespace MyCmd.Component {
             };
             if (!runApp()) {
                 this.AddLine(ErrorMessage.InvalidCommand, true);
+                this.AddLine("");
             }
         }
         #endregion

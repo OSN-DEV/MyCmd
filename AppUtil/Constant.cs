@@ -39,7 +39,7 @@ namespace MyCmd.AppUtil {
         /// <summary>
         /// console error text color
         /// </summary>
-        internal static readonly Brush ConsoleErrorForeground = GetBrushFromHex("#FF0000");
+        internal static readonly Brush ConsoleErrorForeground = GetBrushFromHex("#FF9999");
 
         /// <summary>
         /// console background color
