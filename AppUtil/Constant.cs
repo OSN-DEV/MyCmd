@@ -82,5 +82,8 @@ namespace MyCmd.AppUtil {
     internal static class ErrorMessage {
         internal static readonly string InvalidCommand = "invalid command";
         internal static readonly string InvalidPath = "invalid path";
+        internal static readonly string InvalidParams = "invalid parameters";
+        internal static readonly string InvalidFile = "invalid file";
+        internal static readonly string FileIsExist = "file is already exist";
     }
 }

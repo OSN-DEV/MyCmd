@@ -1,4 +1,5 @@
-﻿using OsnCsLib.File;
+﻿using MyCmd.AppUtil;
+using OsnCsLib.File;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,8 @@ namespace MyCmd.Command {
         public override string CommandKey { get => Key; }
 
         public List<string> Options { set; get; } = new List<string>();
+
+        public string Filter { set; get; } = "";
         #endregion
 
 
@@ -29,10 +32,16 @@ namespace MyCmd.Command {
             var data = new StringBuilder();
             if (0 == this.Options.Count) {
                 foreach (var child in chidren) {
-                    data.Append(child.Name).Append("  ");
+                    if (0 < this.Filter.Length) {
+                        if ((child.Name.StartsWith(this.Filter))) {
+                            data.Append(child.Name).Append("  ");
+                        }
+                    } else {
+                        data.Append(child.Name).Append("  ");
+                    }
                 }
             }
-            base.RaiseDataReceived(data.ToString().Trim());
+            base.RaiseDataReceivedOnce(data.ToString().Trim());
         }
         #endregion
 
@@ -44,13 +53,25 @@ namespace MyCmd.Command {
         /// <returns>true:valid command, false: otherwise</returns>
         protected override bool Parse(string command) {
             this.Options.Clear();
+            if (!command.StartsWith(Key + " ")) {
+                return false;
+            }
+
             var optionsBase = command.Split(' ');
             foreach(var option in optionsBase) {
                 if ("" != option && Key != option) {
-                    this.Options.Add(option);
+                    if (option.StartsWith("-")) {
+                        this.Options.Add(option);
+                    } else {
+                        if (0 < this.Filter.Length) {
+                            base.CommandStatus = CommandState.InvalidParams;
+                            return true;
+                        }
+                        this.Filter = option;
+                    }
                 }
             }
-            return (Key == command || command.StartsWith(Key + " "));
+            return true;
         }
         #endregion
     }

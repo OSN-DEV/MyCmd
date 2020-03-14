@@ -150,7 +150,8 @@ namespace MyCmd.Component {
             // set command list
             this._commandList = new List<CommandBase>() {
                 new CdCommand(),
-                new LsCommand()
+                new LsCommand(),
+                new TouchCommand(),
             };
 
             // Add Event
@@ -293,8 +294,8 @@ namespace MyCmd.Component {
 
 
             foreach (var command in this._commandList) {
+                command.CurrentPath = this._path.CurrentPath;
                 if (command.IsMatch(commandLine)) {
-                    command.CurrentPath = this._path.CurrentPath;
                     command.RunCommand(commandLine);
                     return;
                 }

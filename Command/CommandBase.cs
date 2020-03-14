@@ -16,9 +16,17 @@ namespace MyCmd.Command {
 
         private protected enum CommandState {
             Valid,
-            InvalidParams
+            InvalidParams,
+            InalidFile,
+            FileIsExist,
         }
         private protected CommandState CommandStatus { set; get; } = CommandState.Valid;
+
+        private Dictionary<CommandState, string> _errorMessages = new Dictionary<CommandState, string>() {
+            { CommandState.InvalidParams, ErrorMessage.InvalidParams },
+            { CommandState.InalidFile, ErrorMessage.InvalidFile },
+            { CommandState.FileIsExist, ErrorMessage.FileIsExist }
+        };
         #endregion
 
         #region Public Property 
@@ -59,10 +67,10 @@ namespace MyCmd.Command {
         public  void RunCommand(string command, object userData = null) {
             this._command = command;
             this._userData = userData;
-            if (CommandState.InvalidParams == this.CommandStatus) {
-                this.RaiseErrorReceivedOnce(ErrorMessage.InvalidParams);
+            if (this._errorMessages.ContainsKey(this.CommandStatus)) { 
+                this.RaiseErrorReceivedOnce(this._errorMessages[this.CommandStatus]);
                 return;
-            }
+            } 
             Task.Run(() => {
                 this.RunCommand(command);
             });

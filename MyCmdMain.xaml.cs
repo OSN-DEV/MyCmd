@@ -26,6 +26,7 @@ namespace MyCmd {
         // https://dobon.net/vb/dotnet/process/standardoutput.html
         // https://qiita.com/superriver/items/47fd81b206a59a230c32
         // https://qiita.com/skitoy4321/items/10c47eea93e5c6145d48
+
         #region Constructor
         public MyCmdMain() {
             InitializeComponent();
