@@ -8,7 +8,7 @@ namespace MyCmd.Command {
     class CdCommand : CommandBase {
 
         #region Declration
-        private static Regex regex = new Regex(@"cd (?<args>.+?)(?=\s)|cd (?<args>.+)");
+        private static Regex regex = new Regex(@"^cd\s(?<args>.+)|^cd$");
         #endregion
 
         #region PublicField
