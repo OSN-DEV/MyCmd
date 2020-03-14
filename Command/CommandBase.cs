@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using OsnCsLib.Common;
+using MyCmd.AppUtil;
 
 namespace MyCmd.Command {
     internal abstract class CommandBase {
@@ -12,13 +13,19 @@ namespace MyCmd.Command {
         #region Declaration
         private string _command;
         private object _userData;
+
+        private protected enum CommandState {
+            Valid,
+            InvalidParams
+        }
+        private protected CommandState CommandStatus { set; get; } = CommandState.Valid;
         #endregion
 
         #region Public Property 
         /// <summary>
         /// command key
         /// </summary>
-        public abstract string  CommandKey { get; }
+        public abstract string CommandKey { get; }
 
         /// <summary>
         /// current absolute path
@@ -27,7 +34,7 @@ namespace MyCmd.Command {
         #endregion
 
         #region Public Event
-        public delegate void CommandEventHandler(string key, string command,  string data, object userData);
+        public delegate void CommandEventHandler(string key, string command, string data, object userData);
         public event CommandEventHandler DataReceived;
         public event CommandEventHandler ErrorReceived;
         public event CommandEventHandler CommandEnd;
@@ -39,7 +46,10 @@ namespace MyCmd.Command {
         /// </summary>
         /// <param name="command">comand that checks</param>
         /// <returns>true:match, false:otherwise</returns>
-        public bool IsMatch(string command) => this.Parse(command);
+        public bool IsMatch(string command)  {
+            this.CommandStatus = CommandState.Valid;
+            return this.Parse(command);
+        }
 
         /// <summary>
         /// Run command
@@ -49,6 +59,10 @@ namespace MyCmd.Command {
         public  void RunCommand(string command, object userData = null) {
             this._command = command;
             this._userData = userData;
+            if (CommandState.InvalidParams == this.CommandStatus) {
+                this.RaiseErrorReceivedOnce(ErrorMessage.InvalidParams);
+                return;
+            }
             Task.Run(() => {
                 this.RunCommand(command);
             });
