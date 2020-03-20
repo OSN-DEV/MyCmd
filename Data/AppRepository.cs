@@ -26,6 +26,7 @@ namespace MyCmd.Data {
 
         public List<string> Path { set; get; } = new List<string>();
         public List<string> StartUpCommand { set; get; } = new List<string>();
+        public List<string> Bookmark { set; get; } = new List<string>();
         #endregion
 
         #region Public Method

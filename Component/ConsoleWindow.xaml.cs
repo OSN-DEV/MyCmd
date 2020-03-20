@@ -28,6 +28,15 @@ namespace MyCmd.Component {
 
         private List<CommandBase> _commandList;
         private PathUtil _path = new PathUtil(System.Environment.CurrentDirectory, @"\");
+
+        private enum DataTypes {
+            Complement,
+            BookMark,
+        }
+        private class UserData {
+            public DataTypes DataType;
+            public string StringData;
+        }
         #endregion
 
         #region Constructor
@@ -44,6 +53,24 @@ namespace MyCmd.Component {
         #endregion
 
         #region Public Method
+        /// <summary>
+        /// show bookmark list
+        /// </summary>
+        /// <param name="bookmarks"></param>
+        public void ShowBookmarkList(List<string>bookmarks) {
+            var list = new List<PathInfo>();
+            foreach(var bookmark in bookmarks) {
+                list.Add(new PathInfo(bookmark));
+            }
+
+            this.cPageList.Visibility = Visibility.Visible;
+            var userData = new UserData() {
+                DataType = DataTypes.BookMark
+            };
+            this.cPageList.Setup(list, userData);
+            Util.DoEvents();
+            this.cPageList.SetFocus();
+        }
         #endregion
 
         #region Event
@@ -163,7 +190,16 @@ namespace MyCmd.Component {
                 this.cPageList.Visibility = Visibility.Collapsed;
                 this.cCommand.Focus();
                 this._path.SetAddironalPath(selection);
-                this.AddPath(userData.ToString(), "");
+                var data = userData as UserData;
+                switch(data.DataType) {
+                    case DataTypes.Complement:
+                        this.AddPath(data.StringData, "");
+                        break;
+                    case DataTypes.BookMark:
+                        this.cCommand.Text = $"cd {selection}";
+                        this.SendCommand();
+                        break;
+                }
             };
             this.cPageList.Canceled += (sender, e) => {
                 this.cPageList.Visibility = Visibility.Collapsed;
@@ -266,7 +302,12 @@ namespace MyCmd.Component {
                 return;
             } else {
                 this.cPageList.Visibility = Visibility.Visible;
-                this.cPageList.Setup(list, rest);
+                var userData = new UserData() {
+                    DataType = DataTypes.Complement,
+                    StringData = rest
+                };
+
+                this.cPageList.Setup(list, userData);
                 Util.DoEvents();
                 this.cPageList.SetFocus();
             }
