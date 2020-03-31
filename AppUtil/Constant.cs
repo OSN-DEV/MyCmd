@@ -85,5 +85,6 @@ namespace MyCmd.AppUtil {
         internal static readonly string InvalidParams = "invalid parameters";
         internal static readonly string InvalidFile = "invalid file";
         internal static readonly string FileIsExist = "file is already exist";
+        internal static readonly string NotFound = "{0} not found";
     }
 }

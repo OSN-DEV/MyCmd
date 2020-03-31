@@ -350,7 +350,7 @@ namespace MyCmd.Component {
 
                 var file = new PathUtil(this._path.CurrentPath, commandLine);
                 if (!file.IsFile) {
-                    return false;
+                    return Util.RunApp(commandLine);
                 }
                 if (!Util.RunApp(file.Path)) {
                     return false;

@@ -4,10 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace MyCmd.Command {
-    class LsCommand : CommandBase {
+    internal class LsCommand : CommandBase {
+
+        #region Declration
+        private static Regex regex = new Regex(@"ls$|ls\s");
+        #endregion
 
         #region PublicField
         public static readonly string Key = "ls";
@@ -53,7 +58,8 @@ namespace MyCmd.Command {
         /// <returns>true:valid command, false: otherwise</returns>
         protected override bool Parse(string command) {
             this.Options.Clear();
-            if (!command.StartsWith(Key + " ")) {
+            var match = regex.Match(command);
+            if (!match.Success) {
                 return false;
             }
 
