@@ -6,7 +6,7 @@
         xmlns:u="clr-namespace:MyCmd.Component"
         xmlns:local="clr-namespace:MyCmd"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" KeyDown="Window_KeyDown" MinHeight="100" MinWidth="100">
+        Title="MainWindow" Height="450" Width="800" KeyDown="Window_KeyDown" MinHeight="100" MinWidth="100" AllowDrop="True">
     <Grid Name="cContainer">
         <Grid.RowDefinitions>
             <RowDefinition Height="25" />

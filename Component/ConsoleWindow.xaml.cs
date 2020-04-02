@@ -211,6 +211,21 @@ namespace MyCmd.Component {
                 command.CommandEnd += CommandEnd;
             }
 
+            this.cCommand.PreviewDragOver += (sender, e) => {
+                e.Effects = (e.Data.GetDataPresent(DataFormats.FileDrop) ?
+                DragDropEffects.Copy : DragDropEffects.None);
+                e.Handled = true;
+            };
+            this.cCommand.PreviewDrop += (sender, e) => {
+                if (!e.Data.GetDataPresent(DataFormats.FileDrop)) {
+                    return;
+                }
+                var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (null == files) {
+                    return;
+                }
+                this.cCommand.Text += files[0];
+            };
 
             //
             this.AddLine(this._path.CurrentPath);
